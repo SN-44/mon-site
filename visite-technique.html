@@ -122,9 +122,18 @@
     const container = document.getElementById('folders-container');
     const folders = JSON.parse(localStorage.getItem('folders')) || [];
 
+    // On stocke l'état d'ouverture des dossiers
+    const openedFolders = new Set();
+
     function toggleContent(index) {
       const content = document.getElementById('content-' + index);
-      content.style.display = content.style.display === 'none' ? 'block' : 'none';
+      if (content.style.display === 'block') {
+        content.style.display = 'none';
+        openedFolders.delete(index);
+      } else {
+        content.style.display = 'block';
+        openedFolders.add(index);
+      }
     }
 
     function saveData(index, field, value) {
@@ -133,7 +142,7 @@
       localStorage.setItem('folders', JSON.stringify(folders));
     }
 
-    async function exportPDF(index) {
+    function exportPDF(index) {
       const folder = folders[index];
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF();
@@ -173,7 +182,9 @@
         const content = document.createElement('div');
         content.className = 'folder-content';
         content.id = 'content-' + index;
+        content.style.display = openedFolders.has(index) ? 'block' : 'none';
 
+        // Date visite technique
         const dateGroup = document.createElement('div');
         dateGroup.className = 'form-group';
         dateGroup.innerHTML = '<label>Date de visite technique</label>';
@@ -184,17 +195,17 @@
           e.stopPropagation();
           saveData(index, 'date', e.target.value);
         }
-        // Empêche la fermeture lors du clic
         dateInput.onclick = (e) => e.stopPropagation();
-
         dateGroup.appendChild(dateInput);
 
+        // Sortie câble AC
         const checkboxTitle = document.createElement('label');
         checkboxTitle.textContent = 'Sortie câble AC';
 
         const checkboxRow = document.createElement('div');
         checkboxRow.className = 'checkbox-row';
 
+        // Droite checkbox
         const droiteLabel = document.createElement('label');
         droiteLabel.textContent = 'Droite';
         const droiteCheckbox = document.createElement('input');
@@ -205,14 +216,16 @@
           if(e.target.checked) {
             saveData(index, 'acDroite', true);
             saveData(index, 'acGauche', false);
+            // Ne pas re-render, on met juste à jour l'état visible
+            gaucheCheckbox.checked = false;
           } else {
             saveData(index, 'acDroite', false);
           }
-          render();
         }
         droiteCheckbox.onclick = (e) => e.stopPropagation();
         droiteLabel.appendChild(droiteCheckbox);
 
+        // Gauche checkbox
         const gaucheLabel = document.createElement('label');
         gaucheLabel.textContent = 'Gauche';
         const gaucheCheckbox = document.createElement('input');
@@ -223,10 +236,11 @@
           if(e.target.checked) {
             saveData(index, 'acGauche', true);
             saveData(index, 'acDroite', false);
+            // Ne pas re-render, on met juste à jour l'état visible
+            droiteCheckbox.checked = false;
           } else {
             saveData(index, 'acGauche', false);
           }
-          render();
         }
         gaucheCheckbox.onclick = (e) => e.stopPropagation();
         gaucheLabel.appendChild(gaucheCheckbox);
@@ -234,6 +248,7 @@
         checkboxRow.appendChild(droiteLabel);
         checkboxRow.appendChild(gaucheLabel);
 
+        // Bouton export
         const exportBtn = document.createElement('button');
         exportBtn.textContent = 'Exporter en PDF';
         exportBtn.onclick = (e) => {
