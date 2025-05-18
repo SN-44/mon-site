@@ -1,5 +1,53 @@
 <!DOCTYPE html>
-<html>
-<head><title>Mon Site</title></head>
-<body><h1>Bienvenue sur mon site GitHub Pages!</h1></body>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mon Premier Site GitHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0; padding: 20px;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        main {
+            margin-top: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Bienvenue sur mon site GitHub Pages !</h1>
+</header>
+
+<main>
+    <p>Ceci est un exemple simple de site hébergé sur GitHub.</p>
+    <button onclick="alerte()">Clique-moi</button>
+</main>
+
+<script>
+    function alerte() {
+        alert('Bravo, tu as cliqué sur le bouton !');
+    }
+</script>
+
+</body>
 </html>
