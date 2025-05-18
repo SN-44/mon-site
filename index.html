@@ -61,8 +61,9 @@
     right: 10px;
     background: none;
     border: none;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     cursor: pointer;
+    user-select: none;
   }
   .action-item {
     background: #f0f0f0;
@@ -141,8 +142,8 @@
 
       div.innerHTML = `
         <h3>${dossier.nom}</h3>
-        <button class="toggle-actions" aria-label="Afficher options" onclick="toggleActions(${index})">\u25BC</button>
-        <div class="actions" id="actions-${index}" style="display:none;">
+        <button class="toggle-actions" aria-label="Afficher options" onclick="toggleActions(${index})">&#9660;</button>
+        <div class="actions" id="actions-${index}">
           <div class="action-item">
             <label><input type="checkbox" ${dossier.checks.visiteTechnique ? 'checked' : ''} onchange="toggleCheckbox(${index}, 'visiteTechnique')"> Visite technique</label>
             <label><input type="checkbox" ${dossier.checks.suiviChantier ? 'checked' : ''} onchange="toggleCheckbox(${index}, 'suiviChantier')"> Suivi chantier</label>
@@ -152,6 +153,7 @@
           <button onclick="exportPDF(${index})">Exporter en PDF</button>
         </div>
       `;
+
       container.appendChild(div);
     });
   }
@@ -159,7 +161,7 @@
   function toggleActions(index) {
     const actionsDiv = document.getElementById(`actions-${index}`);
     if (!actionsDiv) return;
-    actionsDiv.style.display = actionsDiv.style.display === 'flex' ? 'none' : 'flex';
+    actionsDiv.style.display = (actionsDiv.style.display === 'flex' ? 'none' : 'flex');
   }
 
   function toggleCheckbox(index, key) {
@@ -174,7 +176,6 @@
       alert("Veuillez entrer un nom de dossier.");
       return;
     }
-    // Vérifier doublon nom
     if (dossiers.some(d => d.nom.toLowerCase() === nom.toLowerCase())) {
       alert("Ce dossier existe déjà.");
       return;
@@ -202,63 +203,63 @@
   function exportPDF(index) {
     const dossier = dossiers[index];
     const pdf = new jsPDF();
-    pdf.setFont("helvetica");
+    pdf.setFont("helvetica", "normal");
     pdf.setFontSize(12);
-    let y = 10;
+    let y = 15;
 
     pdf.text(`Dossier : ${dossier.nom}`, 10, y);
-    y += 10;
+    y += 12;
 
     if (dossier.checks.visiteTechnique) {
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont(undefined, "bold");
       pdf.text("Visite Technique", 10, y);
-      y += 7;
-      pdf.setFont(undefined, 'normal');
-      pdf.text(`Date : ${dossier.visiteTechnique.date || ''}`, 10, y);
-      y += 7;
-      pdf.text(`Observations : ${dossier.visiteTechnique.observations || ''}`, 10, y);
-      y += 12;
+      y += 10;
+      pdf.setFont(undefined, "normal");
+      pdf.text(`Date : ${dossier.visiteTechnique.date || ""}`, 10, y);
+      y += 8;
+      pdf.text(`Observations : ${dossier.visiteTechnique.observations || ""}`, 10, y);
+      y += 14;
     }
 
     if (dossier.checks.suiviChantier) {
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont(undefined, "bold");
       pdf.text("Suivi de Chantier", 10, y);
-      y += 7;
-      pdf.setFont(undefined, 'normal');
-      pdf.text(`État : ${dossier.suiviChantier.etat || ''}`, 10, y);
-      y += 7;
-      pdf.text(`Prochaine étape : ${dossier.suiviChantier.prochaineEtape || ''}`, 10, y);
-      y += 12;
+      y += 10;
+      pdf.setFont(undefined, "normal");
+      pdf.text(`État : ${dossier.suiviChantier.etat || ""}`, 10, y);
+      y += 8;
+      pdf.text(`Prochaine étape : ${dossier.suiviChantier.prochaineEtape || ""}`, 10, y);
+      y += 14;
     }
 
     if (dossier.checks.miseEnService) {
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont(undefined, "bold");
       pdf.text("Mise en Service", 10, y);
-      y += 7;
-      pdf.setFont(undefined, 'normal');
-      pdf.text(`Date : ${dossier.miseEnService.date || ''}`, 10, y);
-      y += 7;
-      pdf.text(`Commentaire : ${dossier.miseEnService.commentaire || ''}`, 10, y);
-      y += 12;
+      y += 10;
+      pdf.setFont(undefined, "normal");
+      pdf.text(`Date : ${dossier.miseEnService.date || ""}`, 10, y);
+      y += 8;
+      pdf.text(`Commentaire : ${dossier.miseEnService.commentaire || ""}`, 10, y);
+      y += 14;
     }
 
     pdf.save(`Dossier_${dossier.nom}.pdf`);
   }
 
-  // Événement au clic pour créer dossier
+  // Evenements
   document.getElementById('create-btn').addEventListener('click', ajouterDossier);
 
-  // Charger au lancement
   window.onload = () => {
     chargerDossiers();
     renderDossiers();
   };
 
-  // Rendre accessible ces fonctions au scope global (car appel dans HTML inline)
+  // Rendre fonctions globales pour onclick HTML
   window.toggleActions = toggleActions;
   window.toggleCheckbox = toggleCheckbox;
   window.supprimerDossier = supprimerDossier;
   window.exportPDF = exportPDF;
+
 </script>
 
 </body>
