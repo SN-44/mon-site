@@ -7,7 +7,8 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       background-color: #f4f4f4;
     }
     header {
@@ -94,7 +95,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-
   <header>
     <h1>Accueil</h1>
   </header>
@@ -115,21 +115,6 @@
   <script>
     const { jsPDF } = window.jspdf;
     let dossiers = JSON.parse(localStorage.getItem('dossiers')) || [];
-
-    if (dossiers.length === 0) {
-      dossiers.push({
-        nom: 'Dossier Démonstration',
-        visiteTechnique: { date: '2025-05-18', observations: 'RAS' },
-        suiviChantier: { etat: 'En cours', prochaineEtape: 'Inspection finale' },
-        miseEnService: { date: '2025-06-01', commentaire: 'Tout est opérationnel' },
-        checks: {
-          visiteTechnique: true,
-          suiviChantier: true,
-          miseEnService: true
-        }
-      });
-      localStorage.setItem('dossiers', JSON.stringify(dossiers));
-    }
 
     function enregistrer() {
       localStorage.setItem('dossiers', JSON.stringify(dossiers));
@@ -163,10 +148,20 @@
       }
     }
 
+    function toggleActions(index) {
+      const actionsDiv = document.getElementById(`actions-${index}`);
+      actionsDiv.style.display = actionsDiv.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function toggleCheckbox(index, key) {
+      dossiers[index].checks[key] = !dossiers[index].checks[key];
+      enregistrer();
+    }
+
     function exportPDF(index) {
       const dossier = dossiers[index];
       const pdf = new jsPDF();
-      pdf.setFont("helvetica", "normal"); // Arial fallback
+      pdf.setFont("helvetica", "normal");
       pdf.setFontSize(12);
 
       let y = 10;
@@ -181,7 +176,7 @@
         pdf.text(`Date : ${dossier.visiteTechnique.date || ''}`, 10, y);
         y += 7;
         pdf.text(`Observations : ${dossier.visiteTechnique.observations || ''}`, 10, y);
-        y += 12;
+        y += 10;
       }
 
       if (dossier.checks.suiviChantier) {
@@ -192,7 +187,7 @@
         pdf.text(`État : ${dossier.suiviChantier.etat || ''}`, 10, y);
         y += 7;
         pdf.text(`Prochaine étape : ${dossier.suiviChantier.prochaineEtape || ''}`, 10, y);
-        y += 12;
+        y += 10;
       }
 
       if (dossier.checks.miseEnService) {
@@ -203,20 +198,10 @@
         pdf.text(`Date : ${dossier.miseEnService.date || ''}`, 10, y);
         y += 7;
         pdf.text(`Commentaire : ${dossier.miseEnService.commentaire || ''}`, 10, y);
-        y += 12;
+        y += 10;
       }
 
       pdf.save(`Dossier_${dossier.nom}.pdf`);
-    }
-
-    function toggleActions(index) {
-      const actionsDiv = document.getElementById(`actions-${index}`);
-      actionsDiv.style.display = actionsDiv.style.display === 'none' ? 'flex' : 'none';
-    }
-
-    function toggleCheckbox(index, key) {
-      dossiers[index].checks[key] = !dossiers[index].checks[key];
-      enregistrer();
     }
 
     function renderDossiers() {
