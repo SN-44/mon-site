@@ -1,250 +1,288 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Accueil</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      background-color: #f4f4f4;
-    }
-    header {
-      background-color: #007acc;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      background-color: #005a99;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Accueil</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0; padding: 0;
+    background-color: #f4f4f4;
+  }
+  header {
+    background-color: #007acc;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #005a99;
+  }
+  nav a {
+    flex: 1 1 25%;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    text-decoration: none;
+    font-weight: bold;
+    border-right: 1px solid #004c82;
+  }
+  nav a:last-child {
+    border-right: none;
+  }
+  nav a.active {
+    background-color: #004c82;
+  }
+  main {
+    padding: 1rem;
+    max-width: 900px;
+    margin: auto;
+  }
+  .dossier {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    position: relative;
+  }
+  .toggle-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+  }
+  .actions {
+    display: none;
+    flex-direction: column;
+    margin-top: 10px;
+    gap: 8px;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+  }
+  .actions label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .actions button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  .actions button:hover {
+    background-color: #005a99;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  button#create-btn {
+    background-color: #007acc;
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button#create-btn:hover {
+    background-color: #005a99;
+  }
+  @media (max-width: 600px) {
     nav a {
-      flex: 1 1 25%;
-      color: white;
-      text-align: center;
-      padding: 1rem;
-      text-decoration: none;
-      font-weight: bold;
-      border-right: 1px solid #004c82;
+      flex: 1 1 100%;
     }
-    nav a:last-child {
-      border-right: none;
-    }
-    nav a.active {
-      background-color: #004c82;
-    }
-    main {
-      padding: 1rem;
-      max-width: 900px;
-      margin: auto;
-    }
-    .dossier {
-      background: white;
-      padding: 1rem;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      position: relative;
-    }
-    .actions {
-      display: none;
-      flex-direction: column;
-      margin-top: 10px;
-      gap: 5px;
-    }
-    .toggle-actions {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-    .action-item {
-      background: #f0f0f0;
-      padding: 0.5rem;
-      border-radius: 4px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      font-size: 1rem;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      margin-top: 5px;
-    }
-    @media (max-width: 600px) {
-      nav a {
-        flex: 1 1 100%;
-      }
-    }
-  </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 </head>
 <body>
 
-  <header>
-    <h1>Accueil</h1>
-  </header>
+<header>
+  <h1>Accueil</h1>
+</header>
 
-  <nav>
-    <a href="index.html" class="active">Accueil</a>
-    <a href="visite-technique.html">Visite technique</a>
-    <a href="suivi-chantier.html">Suivi de chantier</a>
-    <a href="mise-en-service.html">Mise en service</a>
-  </nav>
+<nav>
+  <a href="index.html" class="active">Accueil</a>
+  <a href="visite-technique.html">Visite technique</a>
+  <a href="suivi-chantier.html">Suivi de chantier</a>
+  <a href="mise-en-service.html">Mise en service</a>
+</nav>
 
-  <main>
-    <input type="text" id="dossier-name" placeholder="Nom du dossier" />
-    <button onclick="ajouterDossier()">Créer le dossier</button>
-    <div id="dossiers-container"></div>
-  </main>
+<main>
+  <input type="text" id="dossier-name" placeholder="Nom du dossier" />
+  <button id="create-btn">Créer le dossier</button>
+  <div id="dossiers-container"></div>
+</main>
 
-  <script>
-    const { jsPDF } = window.jspdf;
-    let dossiers = [];
+<script>
+  const { jsPDF } = window.jspdf;
+  let dossiers = [];
 
-    function chargerDossiers() {
-      try {
-        const data = localStorage.getItem('dossiers');
-        if (data) {
-          dossiers = JSON.parse(data);
-          if (!Array.isArray(dossiers)) throw new Error("Données non valides");
-        } else {
-          dossiers = [];
+  function chargerDossiers() {
+    try {
+      const data = localStorage.getItem('dossiers');
+      dossiers = data ? JSON.parse(data) : [];
+      if (!Array.isArray(dossiers)) dossiers = [];
+    } catch {
+      dossiers = [];
+      localStorage.removeItem('dossiers');
+    }
+  }
+
+  function enregistrer() {
+    localStorage.setItem('dossiers', JSON.stringify(dossiers));
+  }
+
+  function renderDossiers() {
+    const container = document.getElementById('dossiers-container');
+    container.innerHTML = '';
+
+    dossiers.forEach((dossier, index) => {
+      const div = document.createElement('div');
+      div.className = 'dossier';
+
+      div.innerHTML = `
+        <h3>${dossier.nom}</h3>
+        <button class="toggle-actions" aria-label="Afficher options">&#x25BC;</button>
+        <div class="actions" style="display:none;">
+          <label><input type="checkbox" data-index="${index}" data-key="visiteTechnique" ${dossier.visiteTechnique ? 'checked' : ''}> Visite technique</label>
+          <label><input type="checkbox" data-index="${index}" data-key="suiviChantier" ${dossier.suiviChantier ? 'checked' : ''}> Suivi chantier</label>
+          <label><input type="checkbox" data-index="${index}" data-key="miseEnService" ${dossier.miseEnService ? 'checked' : ''}> Mise en service</label>
+          <button class="delete-btn" data-index="${index}">Supprimer</button>
+          <button class="export-btn" data-index="${index}">Exporter en PDF</button>
+        </div>
+
+        <div class="pdf-content" style="display:none; padding: 10px; max-width: 600px; margin-top: 10px;">
+          <h2>Dossier : ${dossier.nom}</h2>
+          <h3>Visite Technique</h3>
+          <p><strong>Date :</strong> ${dossier.visiteTechniqueData?.date || ''}</p>
+          <p><strong>Observations :</strong> ${dossier.visiteTechniqueData?.observations || ''}</p>
+
+          <h3>Suivi de Chantier</h3>
+          <p><strong>État :</strong> ${dossier.suiviChantierData?.etat || ''}</p>
+          <p><strong>Prochaine étape :</strong> ${dossier.suiviChantierData?.prochaineEtape || ''}</p>
+
+          <h3>Mise en Service</h3>
+          <p><strong>Date :</strong> ${dossier.miseEnServiceData?.date || ''}</p>
+          <p><strong>Commentaire :</strong> ${dossier.miseEnServiceData?.commentaire || ''}</p>
+        </div>
+      `;
+
+      container.appendChild(div);
+
+      // Toggle actions event
+      const toggleBtn = div.querySelector('.toggle-actions');
+      const actionsDiv = div.querySelector('.actions');
+      toggleBtn.addEventListener('click', () => {
+        actionsDiv.style.display = actionsDiv.style.display === 'flex' ? 'none' : 'flex';
+      });
+
+      // Checkbox change event
+      actionsDiv.querySelectorAll('input[type=checkbox]').forEach(chk => {
+        chk.addEventListener('change', (e) => {
+          const i = parseInt(e.target.dataset.index);
+          const key = e.target.dataset.key;
+          dossiers[i][key] = e.target.checked;
+          enregistrer();
+        });
+      });
+
+      // Delete button event
+      actionsDiv.querySelector('.delete-btn').addEventListener('click', () => {
+        if (confirm(`Supprimer le dossier "${dossier.nom}" ?`)) {
+          dossiers.splice(index, 1);
+          enregistrer();
+          renderDossiers();
         }
-      } catch(e) {
-        console.warn("localStorage 'dossiers' corrompu ou non valide, réinitialisation.", e);
-        localStorage.removeItem('dossiers');
-        dossiers = [];
-      }
-    }
-
-    function enregistrer() {
-      localStorage.setItem('dossiers', JSON.stringify(dossiers));
-      renderDossiers();
-    }
-
-    function ajouterDossier() {
-      const nom = document.getElementById('dossier-name').value.trim();
-      if (!nom) return alert("Le nom du dossier ne peut pas être vide.");
-
-      // Vérifie doublon de nom
-      if (dossiers.some(d => d.nom.toLowerCase() === nom.toLowerCase())) {
-        return alert("Un dossier avec ce nom existe déjà.");
-      }
-
-      dossiers.push({
-        nom,
-        visiteTechnique: {},
-        suiviChantier: {},
-        miseEnService: {},
-        checks: {
-          visiteTechnique: false,
-          suiviChantier: false,
-          miseEnService: false
-        }
       });
 
-      document.getElementById('dossier-name').value = '';
-      enregistrer();
-    }
-
-    function supprimerDossier(index) {
-      if (confirm("Voulez-vous vraiment supprimer ce dossier ?")) {
-        dossiers.splice(index, 1);
-        enregistrer();
-      }
-    }
-
-    async function exportPDF(index) {
-      const content = document.getElementById(`pdf-content-${index}`);
-      content.style.display = 'block';
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      html2canvas(content).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF();
-        const margin = 10;
-        const pdfWidth = pdf.internal.pageSize.getWidth() - margin * 2;
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        pdf.addImage(imgData, 'PNG', margin, margin, pdfWidth, pdfHeight);
-        pdf.save(`Dossier_${dossiers[index].nom}.pdf`);
-        content.style.display = 'none';
+      // Export button event
+      actionsDiv.querySelector('.export-btn').addEventListener('click', () => {
+        exporterPDF(index, div.querySelector('.pdf-content'));
       });
+    });
+  }
+
+  function ajouterDossier() {
+    const nom = document.getElementById('dossier-name').value.trim();
+    if (!nom) {
+      alert('Le nom du dossier ne peut pas être vide');
+      return;
     }
-
-    function toggleActions(index) {
-      const actionsDiv = document.getElementById(`actions-${index}`);
-      actionsDiv.style.display = actionsDiv.style.display === 'none' ? 'flex' : 'none';
+    // Eviter doublon simple
+    if (dossiers.some(d => d.nom.toLowerCase() === nom.toLowerCase())) {
+      alert('Un dossier avec ce nom existe déjà');
+      return;
     }
-
-    function toggleCheckbox(index, key) {
-      dossiers[index].checks[key] = !dossiers[index].checks[key];
-      enregistrer();
-    }
-
-    function renderDossiers() {
-      console.log("Rendu des dossiers", dossiers);
-      const container = document.getElementById('dossiers-container');
-      container.innerHTML = '';
-
-      dossiers.forEach((dossier, index) => {
-        const div = document.createElement('div');
-        div.className = 'dossier';
-
-        div.innerHTML = `
-          <h3>${dossier.nom}</h3>
-          <button class="toggle-actions" onclick="toggleActions(${index})">\u25BC</button>
-          <div class="actions" id="actions-${index}" style="display:none;">
-            <div class="action-item">
-              <label><input type="checkbox" ${dossier.checks.visiteTechnique ? 'checked' : ''} onchange="toggleCheckbox(${index}, 'visiteTechnique')"> Visite technique</label>
-              <label><input type="checkbox" ${dossier.checks.suiviChantier ? 'checked' : ''} onchange="toggleCheckbox(${index}, 'suiviChantier')"> Suivi chantier</label>
-              <label><input type="checkbox" ${dossier.checks.miseEnService ? 'checked' : ''} onchange="toggleCheckbox(${index}, 'miseEnService')"> Mise en service</label>
-            </div>
-            <button onclick="supprimerDossier(${index})">Supprimer</button>
-            <button onclick="exportPDF(${index})">Exporter en PDF</button>
-          </div>
-
-          <div id="pdf-content-${index}" style="display: none; padding: 1rem;">
-            <h2>Dossier : ${dossier.nom}</h2>
-            <h3>Visite Technique</h3>
-            <p><strong>Date :</strong> ${dossier.visiteTechnique?.date || ''}</p>
-            <p><strong>Observations :</strong> ${dossier.visiteTechnique?.observations || ''}</p>
-
-            <h3>Suivi de Chantier</h3>
-            <p><strong>État :</strong> ${dossier.suiviChantier?.etat || ''}</p>
-            <p><strong>Prochaine étape :</strong> ${dossier.suiviChantier?.prochaineEtape || ''}</p>
-
-            <h3>Mise en Service</h3>
-            <p><strong>Date :</strong> ${dossier.miseEnService?.date || ''}</p>
-            <p><strong>Commentaire :</strong> ${dossier.miseEnService?.commentaire || ''}</p>
-          </div>
-        `;
-
-        container.appendChild(div);
-      });
-    }
-
-    // Chargement initial
-    chargerDossiers();
+    dossiers.push({
+      nom,
+      visiteTechnique: false,
+      suiviChantier: false,
+      miseEnService: false,
+      visiteTechniqueData: {},
+      suiviChantierData: {},
+      miseEnServiceData: {}
+    });
+    document.getElementById('dossier-name').value = '';
+    enregistrer();
     renderDossiers();
-  </script>
+  }
+
+  async function exporterPDF(index, pdfContentDiv) {
+    // On rend visible la zone cachée temporairement pour capturer
+    pdfContentDiv.style.display = 'block';
+
+    await new Promise(r => setTimeout(r, 100)); // un peu d'attente
+
+    html2canvas(pdfContentDiv).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // marges gauche/droite
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
+      pdf.save(`Dossier_${dossiers[index].nom}.pdf`);
+
+      pdfContentDiv.style.display = 'none';
+    }).catch(err => {
+      alert('Erreur lors de la création du PDF: ' + err.message);
+      pdfContentDiv.style.display = 'none';
+    });
+  }
+
+  document.getElementById('create-btn').addEventListener('click', ajouterDossier);
+
+  // Au chargement
+  chargerDossiers();
+  renderDossiers();
+</script>
 
 </body>
 </html>
