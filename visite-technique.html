@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Visite Technique</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
     }
     header {
       background-color: #007acc;
@@ -39,7 +38,7 @@
       padding: 20px;
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .folder {
       border: 1px solid #ccc;
@@ -53,6 +52,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      user-select: none;
     }
     .folder-content {
       display: none;
@@ -83,6 +83,7 @@
       align-items: center;
       gap: 8px;
       font-weight: normal;
+      cursor: pointer;
     }
     .checkbox-row input[type="checkbox"] {
       width: 18px;
@@ -129,16 +130,7 @@
     function saveData(index, field, value) {
       folders[index].visiteTechnique = folders[index].visiteTechnique || {};
       folders[index].visiteTechnique[field] = value;
-
-      // Forcing one selection only between droite and gauche
-      if (field === 'acDroite' && value === true) {
-        folders[index].visiteTechnique['acGauche'] = false;
-      } else if (field === 'acGauche' && value === true) {
-        folders[index].visiteTechnique['acDroite'] = false;
-      }
-
       localStorage.setItem('folders', JSON.stringify(folders));
-      render();
     }
 
     async function exportPDF(index) {
@@ -158,9 +150,11 @@
       const vt = folder.visiteTechnique || {};
       pdf.text(`Date de visite technique : ${vt.date || ''}`, 10, y);
       y += 7;
-      pdf.text(`Sortie câble AC - Droite : ${vt.acDroite ? 'Oui' : 'Non'}`, 10, y);
-      y += 7;
-      pdf.text(`Sortie câble AC - Gauche : ${vt.acGauche ? 'Oui' : 'Non'}`, 10, y);
+      pdf.text(`Sortie câble AC : `, 10, y);
+      const acDroite = vt.acDroite ? 'Droite' : '';
+      const acGauche = vt.acGauche ? 'Gauche' : '';
+      const acText = [acDroite, acGauche].filter(Boolean).join(' ou ') || 'Aucune';
+      pdf.text(acText, 60, y);
 
       pdf.save(`Visite_Technique_${folder.name}.pdf`);
     }
@@ -186,7 +180,13 @@
         const dateInput = document.createElement('input');
         dateInput.type = 'date';
         dateInput.value = folder.visiteTechnique?.date || '';
-        dateInput.onchange = (e) => saveData(index, 'date', e.target.value);
+        dateInput.onchange = (e) => {
+          e.stopPropagation();
+          saveData(index, 'date', e.target.value);
+        }
+        // Empêche la fermeture lors du clic
+        dateInput.onclick = (e) => e.stopPropagation();
+
         dateGroup.appendChild(dateInput);
 
         const checkboxTitle = document.createElement('label');
@@ -200,7 +200,17 @@
         const droiteCheckbox = document.createElement('input');
         droiteCheckbox.type = 'checkbox';
         droiteCheckbox.checked = folder.visiteTechnique?.acDroite || false;
-        droiteCheckbox.onchange = (e) => saveData(index, 'acDroite', e.target.checked);
+        droiteCheckbox.onchange = (e) => {
+          e.stopPropagation();
+          if(e.target.checked) {
+            saveData(index, 'acDroite', true);
+            saveData(index, 'acGauche', false);
+          } else {
+            saveData(index, 'acDroite', false);
+          }
+          render();
+        }
+        droiteCheckbox.onclick = (e) => e.stopPropagation();
         droiteLabel.appendChild(droiteCheckbox);
 
         const gaucheLabel = document.createElement('label');
@@ -208,7 +218,17 @@
         const gaucheCheckbox = document.createElement('input');
         gaucheCheckbox.type = 'checkbox';
         gaucheCheckbox.checked = folder.visiteTechnique?.acGauche || false;
-        gaucheCheckbox.onchange = (e) => saveData(index, 'acGauche', e.target.checked);
+        gaucheCheckbox.onchange = (e) => {
+          e.stopPropagation();
+          if(e.target.checked) {
+            saveData(index, 'acGauche', true);
+            saveData(index, 'acDroite', false);
+          } else {
+            saveData(index, 'acGauche', false);
+          }
+          render();
+        }
+        gaucheCheckbox.onclick = (e) => e.stopPropagation();
         gaucheLabel.appendChild(gaucheCheckbox);
 
         checkboxRow.appendChild(droiteLabel);
@@ -216,7 +236,10 @@
 
         const exportBtn = document.createElement('button');
         exportBtn.textContent = 'Exporter en PDF';
-        exportBtn.onclick = () => exportPDF(index);
+        exportBtn.onclick = (e) => {
+          e.stopPropagation();
+          exportPDF(index);
+        }
 
         content.appendChild(dateGroup);
         content.appendChild(checkboxTitle);
