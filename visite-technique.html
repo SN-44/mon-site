@@ -2,14 +2,13 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Visite Technique</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
     }
     header {
       background-color: #007acc;
@@ -39,7 +38,7 @@
       padding: 20px;
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .folder {
       border: 1px solid #ccc;
@@ -53,6 +52,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      user-select: none;
     }
     .folder-content {
       display: none;
@@ -122,9 +122,18 @@
     const container = document.getElementById('folders-container');
     const folders = JSON.parse(localStorage.getItem('folders')) || [];
 
+    // On stocke l'état d'ouverture des dossiers
+    const openedFolders = new Set();
+
     function toggleContent(index) {
       const content = document.getElementById('content-' + index);
-      content.style.display = content.style.display === 'none' ? 'block' : 'none';
+      if (content.style.display === 'block') {
+        content.style.display = 'none';
+        openedFolders.delete(index);
+      } else {
+        content.style.display = 'block';
+        openedFolders.add(index);
+      }
     }
 
     function saveData(index, field, value) {
@@ -133,23 +142,11 @@
       localStorage.setItem('folders', JSON.stringify(folders));
     }
 
-    // Fonction pour s'assurer qu'une seule case est cochée entre droite et gauche
-    function handleExclusiveCheckbox(index, changedField) {
-      if(changedField === 'acDroite' && folders[index].visiteTechnique.acDroite) {
-        folders[index].visiteTechnique.acGauche = false;
-      }
-      if(changedField === 'acGauche' && folders[index].visiteTechnique.acGauche) {
-        folders[index].visiteTechnique.acDroite = false;
-      }
-      localStorage.setItem('folders', JSON.stringify(folders));
-      render(); // on rerend la page pour mettre à jour l'affichage
-    }
-
-    async function exportPDF(index) {
+    function exportPDF(index) {
       const folder = folders[index];
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF();
-      pdf.setFont("helvetica");
+      pdf.setFont("Arial");
       pdf.setFontSize(12);
 
       let y = 10;
@@ -162,9 +159,11 @@
       const vt = folder.visiteTechnique || {};
       pdf.text(`Date de visite technique : ${vt.date || ''}`, 10, y);
       y += 7;
-      pdf.text(`Sortie câble AC - Droite : ${vt.acDroite ? '✔️' : '❌'}`, 10, y);
-      y += 7;
-      pdf.text(`Sortie câble AC - Gauche : ${vt.acGauche ? '✔️' : '❌'}`, 10, y);
+      pdf.text(`Sortie câble AC : `, 10, y);
+      const acDroite = vt.acDroite ? 'Droite' : '';
+      const acGauche = vt.acGauche ? 'Gauche' : '';
+      const acText = [acDroite, acGauche].filter(Boolean).join(' ou ') || 'Aucune';
+      pdf.text(acText, 60, y);
 
       pdf.save(`Visite_Technique_${folder.name}.pdf`);
     }
@@ -183,58 +182,79 @@
         const content = document.createElement('div');
         content.className = 'folder-content';
         content.id = 'content-' + index;
+        content.style.display = openedFolders.has(index) ? 'block' : 'none';
 
-        // Afficher le contenu ouvert si déjà ouvert (pour garder état)
-        if(folder.isOpen) {
-          content.style.display = 'block';
-        } else {
-          content.style.display = 'none';
-        }
-
+        // Date visite technique
         const dateGroup = document.createElement('div');
         dateGroup.className = 'form-group';
         dateGroup.innerHTML = '<label>Date de visite technique</label>';
         const dateInput = document.createElement('input');
         dateInput.type = 'date';
         dateInput.value = folder.visiteTechnique?.date || '';
-        dateInput.onchange = (e) => saveData(index, 'date', e.target.value);
+        dateInput.onchange = (e) => {
+          e.stopPropagation();
+          saveData(index, 'date', e.target.value);
+        }
+        dateInput.onclick = (e) => e.stopPropagation();
         dateGroup.appendChild(dateInput);
 
+        // Sortie câble AC
         const checkboxTitle = document.createElement('label');
         checkboxTitle.textContent = 'Sortie câble AC';
 
         const checkboxRow = document.createElement('div');
         checkboxRow.className = 'checkbox-row';
 
-        // Texte inversé ici
-        const gaucheLabel = document.createElement('label');
-        gaucheLabel.textContent = 'Droite';
-        const gaucheCheckbox = document.createElement('input');
-        gaucheCheckbox.type = 'checkbox';
-        gaucheCheckbox.checked = folder.visiteTechnique?.acDroite || false;
-        gaucheCheckbox.onchange = (e) => {
-          saveData(index, 'acDroite', e.target.checked);
-          if(e.target.checked) handleExclusiveCheckbox(index, 'acDroite');
-        };
-        gaucheLabel.appendChild(gaucheCheckbox);
-
+        // Droite checkbox
         const droiteLabel = document.createElement('label');
-        droiteLabel.textContent = 'Gauche';
+        droiteLabel.textContent = 'Droite';
         const droiteCheckbox = document.createElement('input');
         droiteCheckbox.type = 'checkbox';
-        droiteCheckbox.checked = folder.visiteTechnique?.acGauche || false;
+        droiteCheckbox.checked = folder.visiteTechnique?.acDroite || false;
         droiteCheckbox.onchange = (e) => {
-          saveData(index, 'acGauche', e.target.checked);
-          if(e.target.checked) handleExclusiveCheckbox(index, 'acGauche');
-        };
+          e.stopPropagation();
+          if(e.target.checked) {
+            saveData(index, 'acDroite', true);
+            saveData(index, 'acGauche', false);
+            // Ne pas re-render, on met juste à jour l'état visible
+            gaucheCheckbox.checked = false;
+          } else {
+            saveData(index, 'acDroite', false);
+          }
+        }
+        droiteCheckbox.onclick = (e) => e.stopPropagation();
         droiteLabel.appendChild(droiteCheckbox);
 
-        checkboxRow.appendChild(gaucheLabel);
-        checkboxRow.appendChild(droiteLabel);
+        // Gauche checkbox
+        const gaucheLabel = document.createElement('label');
+        gaucheLabel.textContent = 'Gauche';
+        const gaucheCheckbox = document.createElement('input');
+        gaucheCheckbox.type = 'checkbox';
+        gaucheCheckbox.checked = folder.visiteTechnique?.acGauche || false;
+        gaucheCheckbox.onchange = (e) => {
+          e.stopPropagation();
+          if(e.target.checked) {
+            saveData(index, 'acGauche', true);
+            saveData(index, 'acDroite', false);
+            // Ne pas re-render, on met juste à jour l'état visible
+            droiteCheckbox.checked = false;
+          } else {
+            saveData(index, 'acGauche', false);
+          }
+        }
+        gaucheCheckbox.onclick = (e) => e.stopPropagation();
+        gaucheLabel.appendChild(gaucheCheckbox);
 
+        checkboxRow.appendChild(droiteLabel);
+        checkboxRow.appendChild(gaucheLabel);
+
+        // Bouton export
         const exportBtn = document.createElement('button');
         exportBtn.textContent = 'Exporter en PDF';
-        exportBtn.onclick = () => exportPDF(index);
+        exportBtn.onclick = (e) => {
+          e.stopPropagation();
+          exportPDF(index);
+        }
 
         content.appendChild(dateGroup);
         content.appendChild(checkboxTitle);
