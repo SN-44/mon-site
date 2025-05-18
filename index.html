@@ -72,6 +72,15 @@
         .cases label {
             user-select: none;
         }
+        button.supprimer {
+            margin-left: 15px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -167,8 +176,22 @@
                 casesDiv.appendChild(labelEl);
             });
 
+            const btnSupprimer = document.createElement('button');
+            btnSupprimer.textContent = 'Supprimer';
+            btnSupprimer.className = 'supprimer';
+
+            btnSupprimer.addEventListener('click', () => {
+                const confirmation = confirm(`Supprimer le dossier "${dossier.nom}" ?`);
+                if (confirmation) {
+                    dossiers.splice(index, 1);
+                    sauvegarderDossiers(dossiers);
+                    afficherListe(dossiers);
+                }
+            });
+
             divDossier.appendChild(spanNom);
             divDossier.appendChild(casesDiv);
+            divDossier.appendChild(btnSupprimer);
 
             listeDossiers.appendChild(divDossier);
         });
