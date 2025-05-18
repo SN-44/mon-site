@@ -3,49 +3,88 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mon Premier Site GitHub</title>
+    <title>Mon Site - Accueil</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0; padding: 20px;
+            margin: 0; padding: 0;
+            background-color: #f9f9f9;
         }
         header {
-            background-color: #4CAF50;
+            background-color: #007acc;
+            padding: 15px 20px;
             color: white;
-            padding: 10px 0;
-            text-align: center;
         }
-        main {
-            margin-top: 20px;
+        nav {
+            display: flex;
+            background-color: #005a99;
         }
-        button {
-            background-color: #4CAF50;
+        nav button {
+            flex: 1;
+            padding: 15px 0;
+            background: none;
             border: none;
             color: white;
-            padding: 10px 15px;
-            cursor: pointer;
             font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        button:hover {
-            background-color: #45a049;
+        nav button:hover {
+            background-color: #004c82;
+        }
+        nav button.active {
+            background-color: #003f6b;
+            font-weight: bold;
+        }
+        main {
+            padding: 20px;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Bienvenue sur mon site GitHub Pages !</h1>
+    <h1>Bienvenue sur mon site</h1>
 </header>
 
+<nav>
+    <button id="tab1" class="active" onclick="showContent('visite')">Visite technique</button>
+    <button id="tab2" onclick="showContent('suivi')">Suivi de chantier</button>
+    <button id="tab3" onclick="showContent('mise')">Mise en service</button>
+</nav>
+
 <main>
-    <p>Ceci est un exemple simple de site hébergé sur GitHub.</p>
-    <button onclick="alerte()">Clique-moi</button>
+    <section id="visite" class="content-section">
+        <h2>Visite technique</h2>
+        <p>Contenu détaillé pour la visite technique. Ici, tu peux ajouter des informations, des images, des liens, etc.</p>
+    </section>
+    <section id="suivi" class="content-section" style="display:none;">
+        <h2>Suivi de chantier</h2>
+        <p>Informations et mises à jour concernant le suivi de chantier.</p>
+    </section>
+    <section id="mise" class="content-section" style="display:none;">
+        <h2>Mise en service</h2>
+        <p>Détails sur la mise en service, procédures, contacts, etc.</p>
+    </section>
 </main>
 
 <script>
-    function alerte() {
-        alert('Bravo, tu as cliqué sur le bouton !');
+    function showContent(sectionId) {
+        // Cacher toutes les sections
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        // Afficher la section sélectionnée
+        document.getElementById(sectionId).style.display = 'block';
+
+        // Gestion des classes active pour les boutons
+        document.querySelectorAll('nav button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        // Trouver le bouton correspondant et lui ajouter la classe active
+        if(sectionId === 'visite') document.getElementById('tab1').classList.add('active');
+        else if(sectionId === 'suivi') document.getElementById('tab2').classList.add('active');
+        else if(sectionId === 'mise') document.getElementById('tab3').classList.add('active');
     }
 </script>
 
