@@ -249,33 +249,53 @@
     renderDossiers();
   }
 
-  async function exporterPDF(index, pdfContentDiv) {
-    // On rend visible la zone cachée temporairement pour capturer
-    pdfContentDiv.style.display = 'block';
+function exportPDF(index) {
+  const dossier = dossiers[index];
+  const pdf = new jsPDF();
 
-    await new Promise(r => setTimeout(r, 100)); // un peu d'attente
+  pdf.setFont("arial", "normal");
+  pdf.setFontSize(12);
 
-    html2canvas(pdfContentDiv).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        unit: 'mm',
-        format: 'a4',
-        compress: true
-      });
+  let y = 10;
+  pdf.text(`Dossier : ${dossier.nom}`, 10, y);
+  y += 10;
 
-      const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // marges gauche/droite
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
-      pdf.save(`Dossier_${dossiers[index].nom}.pdf`);
-
-      pdfContentDiv.style.display = 'none';
-    }).catch(err => {
-      alert('Erreur lors de la création du PDF: ' + err.message);
-      pdfContentDiv.style.display = 'none';
-    });
+  if (dossier.checks.visiteTechnique) {
+    pdf.setFont(undefined, 'bold');
+    pdf.text("Visite Technique", 10, y);
+    y += 7;
+    pdf.setFont(undefined, 'normal');
+    pdf.text(`Date : ${dossier.visiteTechnique.date || ''}`, 10, y);
+    y += 7;
+    pdf.text(`Observations : ${dossier.visiteTechnique.observations || ''}`, 10, y);
+    y += 12;
   }
+
+  if (dossier.checks.suiviChantier) {
+    pdf.setFont(undefined, 'bold');
+    pdf.text("Suivi de Chantier", 10, y);
+    y += 7;
+    pdf.setFont(undefined, 'normal');
+    pdf.text(`État : ${dossier.suiviChantier.etat || ''}`, 10, y);
+    y += 7;
+    pdf.text(`Prochaine étape : ${dossier.suiviChantier.prochaineEtape || ''}`, 10, y);
+    y += 12;
+  }
+
+  if (dossier.checks.miseEnService) {
+    pdf.setFont(undefined, 'bold');
+    pdf.text("Mise en Service", 10, y);
+    y += 7;
+    pdf.setFont(undefined, 'normal');
+    pdf.text(`Date : ${dossier.miseEnService.date || ''}`, 10, y);
+    y += 7;
+    pdf.text(`Commentaire : ${dossier.miseEnService.commentaire || ''}`, 10, y);
+    y += 12;
+  }
+
+  pdf.save(`Dossier_${dossier.nom}.pdf`);
+}
+
 
   document.getElementById('create-btn').addEventListener('click', ajouterDossier);
 
