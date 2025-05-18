@@ -29,8 +29,9 @@
             font-size: 16px;
             transition: background-color 0.3s;
         }
-        nav a:hover {
+        nav a:hover, nav a.active {
             background-color: #004c82;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -41,6 +42,7 @@
 </header>
 
 <nav>
+    <a href="index.html" class="active">Accueil</a>
     <a href="visite-technique.html">Visite technique</a>
     <a href="suivi-chantier.html">Suivi de chantier</a>
     <a href="mise-en-service.html">Mise en service</a>
