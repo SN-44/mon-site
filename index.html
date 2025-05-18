@@ -1,274 +1,357 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Accueil</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      background-color: #f9f9f9;
-      line-height: 1.4;
-    }
-    main {
-      max-width: 900px;
-      margin: 20px auto;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 0 7px rgba(0,0,0,0.1);
-      padding: 20px;
-    }
-    form {
-      margin-bottom: 25px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-    form input[type="text"] {
-      flex-grow: 1;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      min-width: 0;
-    }
-    form button {
-      padding: 10px 20px;
-      background-color: #007acc;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    form button:hover {
-      background-color: #005a99;
-    }
-    ul#folders-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    ul#folders-list li {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 15px;
-      border-bottom: 1px solid #ddd;
-    }
-    ul#folders-list li:last-child {
-      border-bottom: none;
-    }
-    .folder-name {
-      font-weight: bold;
-      font-size: 16px;
-      flex: 1 1 100%;
-      margin-bottom: 8px;
-    }
-    .checkboxes {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      flex: 1 1 100%;
-    }
-    .checkboxes label {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .checkboxes input[type="checkbox"] {
-      margin-right: 6px;
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-    .actions {
-      margin-left: 10px;
-      flex-shrink: 0;
-    }
-    .delete-btn {
-      background-color: #e74c3c;
-      border: none;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s;
-      font-size: 14px;
-    }
-    .delete-btn:hover {
-      background-color: #c0392b;
-    }
-    @media (min-width: 480px) {
-      ul#folders-list li {
-        flex-wrap: nowrap;
-      }
-      .folder-name {
-        flex: 1 1 auto;
-        margin-bottom: 0;
-        font-size: 18px;
-      }
-      .checkboxes {
-        flex: 0 1 auto;
-      }
-    }
-    @media (max-width: 400px) {
-      form button {
-        flex: 1 1 100%;
-      }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Accueil</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0; padding: 0;
+            background-color: #f9f9f9;
+            line-height: 1.4;
+        }
+        header {
+            background-color: #007acc;
+            padding: 15px 20px;
+            color: white;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            background-color: #005a99;
+            flex-wrap: wrap;
+        }
+        nav a {
+            flex: 1 1 33%;
+            padding: 15px 0;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            border-top: 1px solid #004c82;
+            border-right: 1px solid #004c82;
+        }
+        nav a:last-child {
+            border-right: none;
+        }
+        nav a:hover, nav a.active {
+            background-color: #004c82;
+            font-weight: bold;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 7px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        form {
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        form input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            min-width: 0;
+        }
+        form button {
+            padding: 10px 20px;
+            background-color: #007acc;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        form button:hover {
+            background-color: #005a99;
+        }
+
+        ul#folders-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        ul#folders-list li {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        ul#folders-list li:last-child {
+            border-bottom: none;
+        }
+        .folder-name {
+            font-weight: bold;
+            font-size: 16px;
+            flex: 1 1 100%;
+            margin-bottom: 8px;
+        }
+        .checkboxes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1 1 100%;
+        }
+        .checkboxes label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .checkboxes input[type="checkbox"] {
+            margin-right: 6px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .actions {
+            margin-left: 10px;
+            flex-shrink: 0;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .delete-btn, .export-btn {
+            background-color: #e74c3c;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        .export-btn {
+            background-color: #007acc;
+        }
+        .export-btn:hover {
+            background-color: #005a99;
+        }
+
+        @media (min-width: 480px) {
+            ul#folders-list li {
+                flex-wrap: nowrap;
+            }
+            .folder-name {
+                flex: 1 1 auto;
+                margin-bottom: 0;
+                font-size: 18px;
+            }
+            .checkboxes {
+                flex: 0 1 auto;
+            }
+        }
+
+        @media (max-width: 400px) {
+            form button {
+                flex: 1 1 100%;
+            }
+            .actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<nav style="background-color:#007acc; padding:10px 0; text-align:center; margin-bottom:20px;">
-  <a href="index.html" 
-     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
-     id="nav-accueil">Accueil</a>
-  <a href="visite-technique.html" 
-     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
-     id="nav-visite">Visite technique</a>
-  <a href="suivi-chantier.html" 
-     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
-     id="nav-suivi">Suivi chantier</a>
-  <a href="mise-en-service.html" 
-     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
-     id="nav-mise">Mise en service</a>
+<header>
+    <h1>Accueil</h1>
+</header>
+
+<nav>
+    <a href="index.html" class="active">Accueil</a>
+    <a href="visite-technique.html">Visite technique</a>
+    <a href="suivi-chantier.html">Suivi de chantier</a>
+    <a href="mise-en-service.html">Mise en service</a>
 </nav>
 
-<script>
-  const pageMap = {
-    'index.html': 'nav-accueil',
-    'visite-technique.html': 'nav-visite',
-    'suivi-chantier.html': 'nav-suivi',
-    'mise-en-service.html': 'nav-mise',
-  };
-  const currentPage = window.location.pathname.split('/').pop();
-  if (pageMap[currentPage]) {
-    const activeNav = document.getElementById(pageMap[currentPage]);
-    if (activeNav) {
-      activeNav.style.backgroundColor = '#005a99';
-      activeNav.style.padding = '8px 12px';
-      activeNav.style.borderRadius = '4px';
-    }
-  }
-</script>
-
 <main>
-  <h1>Accueil</h1>
-  <form id="folder-form">
-    <input type="text" id="folder-name" placeholder="Nom du dossier" required minlength="1" />
-    <button type="submit">Créer dossier</button>
-  </form>
+    <form id="folder-form">
+        <input type="text" id="folder-name" placeholder="Nom du dossier" required minlength="1" />
+        <button type="submit">Créer dossier</button>
+    </form>
 
-  <ul id="folders-list"></ul>
+    <ul id="folders-list"></ul>
 </main>
 
+<!-- jsPDF CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-  const folderForm = document.getElementById('folder-form');
-  const folderNameInput = document.getElementById('folder-name');
-  const foldersList = document.getElementById('folders-list');
+    const { jsPDF } = window.jspdf;
 
-  let folders = JSON.parse(localStorage.getItem('folders')) || [];
+    const folderForm = document.getElementById('folder-form');
+    const folderNameInput = document.getElementById('folder-name');
+    const foldersList = document.getElementById('folders-list');
 
-  function saveFolders() {
-    localStorage.setItem('folders', JSON.stringify(folders));
-  }
+    let folders = JSON.parse(localStorage.getItem('folders')) || [];
 
-  function createFolderElement(folder) {
-    const li = document.createElement('li');
-    li.dataset.id = folder.id;
+    function saveFolders() {
+        localStorage.setItem('folders', JSON.stringify(folders));
+    }
 
-    const nameDiv = document.createElement('div');
-    nameDiv.className = 'folder-name';
-    nameDiv.textContent = folder.name;
+    function createFolderElement(folder) {
+        const li = document.createElement('li');
+        li.dataset.id = folder.id;
 
-    const checkboxesDiv = document.createElement('div');
-    checkboxesDiv.className = 'checkboxes';
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'folder-name';
+        nameDiv.textContent = folder.name;
 
-    ['visite-technique', 'suivi-chantier', 'mise-en-service'].forEach(key => {
-      const labelTextMap = {
-        'visite-technique': 'Visite technique',
-        'suivi-chantier': 'Suivi chantier',
-        'mise-en-service': 'Mise en service'
-      };
-      const label = document.createElement('label');
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = folder.checkedStates[key] || false;
-      checkbox.dataset.key = key;
-      checkbox.addEventListener('change', () => {
-        folder.checkedStates[key] = checkbox.checked;
-        saveFolders();
-      });
-      label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(labelTextMap[key]));
-      checkboxesDiv.appendChild(label);
-    });
+        const checkboxesDiv = document.createElement('div');
+        checkboxesDiv.className = 'checkboxes';
 
-    const actionsDiv = document.createElement('div');
-    actionsDiv.className = 'actions';
+        ['visite-technique', 'suivi-chantier', 'mise-en-service'].forEach(key => {
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = folder.checkedStates[key] || false;
+            checkbox.dataset.key = key;
+            checkbox.addEventListener('change', () => {
+                folder.checkedStates[key] = checkbox.checked;
+                saveFolders();
+            });
+            label.appendChild(checkbox);
 
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'Supprimer';
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.addEventListener('click', () => {
-      if (confirm(`Voulez-vous vraiment supprimer le dossier "${folder.name}" ?`)) {
-        folders = folders.filter(f => f.id !== folder.id);
+            let labelText = '';
+            if(key === 'visite-technique') labelText = 'Visite technique';
+            else if(key === 'suivi-chantier') labelText = 'Suivi chantier';
+            else if(key === 'mise-en-service') labelText = 'Mise en service';
+
+            label.appendChild(document.createTextNode(labelText));
+            checkboxesDiv.appendChild(label);
+        });
+
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'actions';
+
+        // Bouton supprimer
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Supprimer';
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.addEventListener('click', () => {
+            if(confirm(`Voulez-vous vraiment supprimer le dossier "${folder.name}" ?`)) {
+                folders = folders.filter(f => f.id !== folder.id);
+                saveFolders();
+                renderFolders();
+            }
+        });
+        actionsDiv.appendChild(deleteBtn);
+
+        // Bouton Export PDF
+        const exportBtn = document.createElement('button');
+        exportBtn.textContent = 'Exporter PDF';
+        exportBtn.className = 'export-btn';
+        exportBtn.addEventListener('click', () => exportFolderPDF(folder));
+        actionsDiv.appendChild(exportBtn);
+
+        li.appendChild(nameDiv);
+        li.appendChild(checkboxesDiv);
+        li.appendChild(actionsDiv);
+
+        return li;
+    }
+
+    function renderFolders() {
+        foldersList.innerHTML = '';
+        if (folders.length === 0) {
+            foldersList.innerHTML = '<p>Aucun dossier créé pour l’instant.</p>';
+            return;
+        }
+        folders.forEach(folder => {
+            foldersList.appendChild(createFolderElement(folder));
+        });
+    }
+
+    folderForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const name = folderNameInput.value.trim();
+        if (name === '') return;
+
+        const newFolder = {
+            id: Date.now(),
+            name,
+            checkedStates: {
+                'visite-technique': false,
+                'suivi-chantier': false,
+                'mise-en-service': false
+            }
+        };
+        folders.push(newFolder);
         saveFolders();
         renderFolders();
-      }
+        folderNameInput.value = '';
+        folderNameInput.focus();
     });
 
-    actionsDiv.appendChild(deleteBtn);
+    // Fonction d'export PDF en Arial 12, avec uniquement sections cochées
+    function exportFolderPDF(folder) {
+        const pdf = new jsPDF();
 
-    li.appendChild(nameDiv);
-    li.appendChild(checkboxesDiv);
-    li.appendChild(actionsDiv);
+        pdf.setFont('helvetica'); // Arial n'est pas dispo par défaut, helvetica est équivalent
+        pdf.setFontSize(12);
 
-    return li;
-  }
+        let y = 15;
+        pdf.text(`Dossier : ${folder.name}`, 10, y);
+        y += 10;
 
-  function renderFolders() {
-    foldersList.innerHTML = '';
-    if (folders.length === 0) {
-      foldersList.innerHTML = '<p>Aucun dossier créé pour l’instant.</p>';
-      return;
+        if (folder.checkedStates['visite-technique']) {
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Visite technique', 10, y);
+            y += 8;
+            pdf.setFont(undefined, 'normal');
+            pdf.text('Contenu spécifique de la visite technique...', 10, y); 
+            y += 12;
+        }
+
+        if (folder.checkedStates['suivi-chantier']) {
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Suivi chantier', 10, y);
+            y += 8;
+            pdf.setFont(undefined, 'normal');
+            pdf.text('Contenu spécifique du suivi chantier...', 10, y);
+            y += 12;
+        }
+
+        if (folder.checkedStates['mise-en-service']) {
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Mise en service', 10, y);
+            y += 8;
+            pdf.setFont(undefined, 'normal');
+            pdf.text('Contenu spécifique de la mise en service...', 10, y);
+            y += 12;
+        }
+
+        // Si aucune section cochée, prévenir
+        if (!folder.checkedStates['visite-technique'] && !folder.checkedStates['suivi-chantier'] && !folder.checkedStates['mise-en-service']) {
+            alert('Veuillez cocher au moins un onglet à exporter.');
+            return;
+        }
+
+        pdf.save(`Dossier_${folder.name}.pdf`);
     }
-    folders.forEach(folder => {
-      foldersList.appendChild(createFolderElement(folder));
-    });
-  }
 
-  folderForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const name = folderNameInput.value.trim();
-    if (name === '') return;
-
-    const newFolder = {
-      id: Date.now(),
-      name,
-      checkedStates: {
-        'visite-technique': false,
-        'suivi-chantier': false,
-        'mise-en-service': false
-      }
-    };
-    folders.push(newFolder);
-    saveFolders();
     renderFolders();
-    folderNameInput.value = '';
-    folderNameInput.focus();
-  });
-
-  renderFolders();
 </script>
 
 </body>
