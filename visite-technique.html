@@ -3,66 +3,101 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Visite technique</title>
+  <title>Visite Technique</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0; padding: 0;
       background-color: #f9f9f9;
-      line-height: 1.4;
     }
+    header {
+      background-color: #007acc;
+      color: white;
+      padding: 15px 20px;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      background-color: #005a99;
+    }
+    nav a {
+      flex: 1;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+      text-decoration: none;
+      border-right: 1px solid #004c82;
+    }
+    nav a:last-child {
+      border-right: none;
+    }
+    nav a.active, nav a:hover {
+      background-color: #004c82;
+      font-weight: bold;
+    }
+
     main {
       max-width: 900px;
       margin: 20px auto;
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 0 7px rgba(0,0,0,0.1);
       padding: 20px;
+      border-radius: 8px;
     }
+
     ul#folders-list {
       list-style: none;
       padding: 0;
       margin: 0;
     }
+
     ul#folders-list li {
       border-bottom: 1px solid #ddd;
-      padding: 10px 15px;
+      padding: 10px 0;
+    }
+
+    .accordion-header {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
       justify-content: space-between;
-    }
-    ul#folders-list li:last-child {
-      border-bottom: none;
-    }
-    .folder-name {
+      align-items: center;
+      cursor: pointer;
+      padding: 10px;
       font-weight: bold;
-      font-size: 18px;
-      flex: 1 1 60%;
-      margin-bottom: 8px;
-    }
-    .inputs {
-      flex: 1 1 100%;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .inputs label {
-      flex: 1 1 45%;
-      font-size: 14px;
-    }
-    .inputs input[type="text"], .inputs input[type="date"] {
-      width: 100%;
-      padding: 6px 8px;
-      font-size: 14px;
-      border: 1px solid #ccc;
+      font-size: 16px;
+      background-color: #f0f0f0;
       border-radius: 4px;
     }
-    .actions {
-      flex-shrink: 0;
+
+    .accordion-header:hover {
+      background-color: #e0e0e0;
     }
-    .delete-btn {
+
+    .accordion-arrow {
+      transition: transform 0.3s ease;
+    }
+
+    .accordion-arrow.open {
+      transform: rotate(90deg);
+    }
+
+    .accordion-content {
+      display: none;
+      padding: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .accordion-content textarea {
+      width: 100%;
+      min-height: 80px;
+      font-size: 14px;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      font-family: Arial, sans-serif;
+      margin-bottom: 10px;
+    }
+
+    button.delete-btn {
       background-color: #e74c3c;
       border: none;
       color: white;
@@ -71,50 +106,32 @@
       cursor: pointer;
       font-weight: bold;
       transition: background-color 0.3s;
-      font-size: 14px;
     }
-    .delete-btn:hover {
+
+    button.delete-btn:hover {
       background-color: #c0392b;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
     }
   </style>
 </head>
 <body>
 
-<nav style="background-color:#007acc; padding:10px 0; text-align:center; margin-bottom:20px;">
-  <a href="index.html" 
-     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
-     id="nav-accueil">Accueil</a>
-  <a href="visite-technique.html" 
-     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
-     id="nav-visite">Visite technique</a>
-  <a href="suivi-chantier.html" 
-     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
-     id="nav-suivi">Suivi chantier</a>
-  <a href="mise-en-service.html" 
-     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
-     id="nav-mise">Mise en service</a>
+<header>
+  <h1>Visite Technique</h1>
+</header>
+
+<nav>
+  <a href="index.html">Accueil</a>
+  <a href="visite-technique.html" class="active">Visite technique</a>
+  <a href="suivi-chantier.html">Suivi de chantier</a>
+  <a href="mise-en-service.html">Mise en service</a>
 </nav>
 
-<script>
-  const pageMap = {
-    'index.html': 'nav-accueil',
-    'visite-technique.html': 'nav-visite',
-    'suivi-chantier.html': 'nav-suivi',
-    'mise-en-service.html': 'nav-mise',
-  };
-  const currentPage = window.location.pathname.split('/').pop();
-  if (pageMap[currentPage]) {
-    const activeNav = document.getElementById(pageMap[currentPage]);
-    if (activeNav) {
-      activeNav.style.backgroundColor = '#005a99';
-      activeNav.style.padding = '8px 12px';
-      activeNav.style.borderRadius = '4px';
-    }
-  }
-</script>
-
 <main>
-  <h1>Visite technique</h1>
   <ul id="folders-list"></ul>
 </main>
 
@@ -128,51 +145,33 @@
 
   function createFolderElement(folder) {
     const li = document.createElement('li');
-    li.dataset.id = folder.id;
 
-    const nameDiv = document.createElement('div');
-    nameDiv.className = 'folder-name';
-    nameDiv.textContent = folder.name;
+    // Header
+    const header = document.createElement('div');
+    header.className = 'accordion-header';
 
-    const inputsDiv = document.createElement('div');
-    inputsDiv.className = 'inputs';
+    const title = document.createElement('span');
+    title.textContent = folder.name;
 
-    // Exemple de champs à renseigner dans visite technique
-    // On peut en rajouter/modifier suivant besoin
-    // On stocke dans folder.visiteTechnique (objet)
+    const arrow = document.createElement('span');
+    arrow.textContent = '▶';
+    arrow.className = 'accordion-arrow';
 
-    // Date visite
-    const dateLabel = document.createElement('label');
-    dateLabel.textContent = 'Date visite :';
-    const dateInput = document.createElement('input');
-    dateInput.type = 'date';
-    dateInput.value = folder.visiteTechnique?.dateVisite || '';
-    dateInput.addEventListener('change', () => {
-      folder.visiteTechnique = folder.visiteTechnique || {};
-      folder.visiteTechnique.dateVisite = dateInput.value;
+    header.appendChild(title);
+    header.appendChild(arrow);
+    li.appendChild(header);
+
+    // Contenu caché
+    const content = document.createElement('div');
+    content.className = 'accordion-content';
+
+    const textarea = document.createElement('textarea');
+    textarea.placeholder = "Notes / détails visite technique...";
+    textarea.value = folder.visiteTechnique || '';
+    textarea.addEventListener('input', () => {
+      folder.visiteTechnique = textarea.value;
       saveFolders();
     });
-    dateLabel.appendChild(dateInput);
-
-    // Commentaires visite
-    const commentLabel = document.createElement('label');
-    commentLabel.textContent = 'Commentaires :';
-    const commentInput = document.createElement('input');
-    commentInput.type = 'text';
-    commentInput.placeholder = 'Commentaires';
-    commentInput.value = folder.visiteTechnique?.commentaires || '';
-    commentInput.addEventListener('input', () => {
-      folder.visiteTechnique = folder.visiteTechnique || {};
-      folder.visiteTechnique.commentaires = commentInput.value;
-      saveFolders();
-    });
-    commentLabel.appendChild(commentInput);
-
-    inputsDiv.appendChild(dateLabel);
-    inputsDiv.appendChild(commentLabel);
-
-    const actionsDiv = document.createElement('div');
-    actionsDiv.className = 'actions';
 
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Supprimer';
@@ -185,11 +184,16 @@
       }
     });
 
-    actionsDiv.appendChild(deleteBtn);
+    content.appendChild(textarea);
+    content.appendChild(deleteBtn);
+    li.appendChild(content);
 
-    li.appendChild(nameDiv);
-    li.appendChild(inputsDiv);
-    li.appendChild(actionsDiv);
+    // Toggle du contenu
+    header.addEventListener('click', () => {
+      const isOpen = content.style.display === 'block';
+      content.style.display = isOpen ? 'none' : 'block';
+      arrow.classList.toggle('open', !isOpen);
+    });
 
     return li;
   }
@@ -197,7 +201,7 @@
   function renderFolders() {
     foldersList.innerHTML = '';
     if (folders.length === 0) {
-      foldersList.innerHTML = '<p>Aucun dossier disponible.</p>';
+      foldersList.innerHTML = '<p>Aucun dossier créé pour l’instant.</p>';
       return;
     }
     folders.forEach(folder => {
