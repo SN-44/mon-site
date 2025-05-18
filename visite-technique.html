@@ -208,14 +208,24 @@
     pdfBtn.addEventListener('click', () => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.setFont("Arial");
+      doc.setFont("Arial", "normal");
       doc.setFontSize(12);
-      doc.text(`Dossier : ${folder.name}`, 10, 20);
-      const text = folder.visiteTechnique || "(Aucune information saisie)";
-      const lines = doc.splitTextToSize(text, 180);
-      doc.text("Visite technique :", 10, 30);
-      doc.text(lines, 10, 40);
-      doc.save(`visite-technique-${folder.name}.pdf`);
+
+      const marginLeft = 10;
+      let y = 20;
+
+      doc.text(`Dossier : ${folder.name}`, marginLeft, y);
+      y += 10;
+
+      doc.text("Visite technique :", marginLeft, y);
+      y += 10;
+
+      const content = folder.visiteTechnique?.trim() || "(Aucune information saisie)";
+      const lines = doc.splitTextToSize(content, 180);
+      doc.text(lines, marginLeft, y);
+
+      const fileName = `visite-technique-${folder.name.replace(/\s+/g, "_")}.pdf`;
+      doc.save(fileName);
     });
 
     btnGroup.appendChild(pdfBtn);
