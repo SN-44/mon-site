@@ -1,136 +1,70 @@
-<script src="folders.js"></script>
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Suivi de chantier</title>
+  <title>Suivi chantier</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      background-color: #f4f4f4;
-    }
-    header {
-      background-color: #007acc;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      background-color: #005a99;
-    }
-    nav a {
-      flex: 1 1 33%;
-      color: white;
-      text-align: center;
-      padding: 1rem;
-      text-decoration: none;
-      font-weight: bold;
-      border-right: 1px solid #004c82;
-    }
-    nav a:last-child {
-      border-right: none;
-    }
-    nav a.active {
-      background-color: #004c82;
-    }
-    main {
-      padding: 1rem;
-      max-width: 900px;
-      margin: auto;
-    }
-    .dossier {
-      background: white;
-      padding: 1rem;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      font-size: 1rem;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    @media (max-width: 600px) {
-      nav a {
-        flex: 1 1 100%;
-      }
-    }
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 10px; }
+    ul { padding: 0; list-style: none; }
+    li { padding: 8px 0; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between; }
+    label { display: flex; align-items: center; gap: 5px; }
+    button { margin-left: 10px; background-color: #e74c3c; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #c0392b; }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Suivi de chantier</h1>
-  </header>
+  <h1>Suivi de chantier</h1>
 
-  <nav>
-    <a href="index.html">Accueil</a>
-    <a href="visite-technique.html">Visite technique</a>
-    <a href="suivi-chantier.html" class="active">Suivi de chantier</a>
-    <a href="mise-en-service.html">Mise en service</a>
-  </nav>
+  <ul id="folders-list"></ul>
 
-  <main id="dossiers-container">
-    <!-- Dossiers seront injectés ici -->
-  </main>
-
+  <script src="folders.js"></script>
   <script>
-    let dossiers = JSON.parse(localStorage.getItem('dossiers')) || [];
+    const foldersList = document.getElementById('folders-list');
 
-    function saveDossiers() {
-      localStorage.setItem('dossiers', JSON.stringify(dossiers));
-    }
+    function renderFolders() {
+      const folders = loadFolders();
+      foldersList.innerHTML = '';
 
-    function renderDossiers() {
-      const container = document.getElementById('dossiers-container');
-      container.innerHTML = '';
+      if (folders.length === 0) {
+        foldersList.innerHTML = '<li>Aucun dossier créé.</li>';
+        return;
+      }
 
-      dossiers.forEach((dossier, index) => {
-        const div = document.createElement('div');
-        div.className = 'dossier';
+      folders.forEach(folder => {
+        const li = document.createElement('li');
 
-        div.innerHTML = `
-          <h3>${dossier.nom}</h3>
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = folder.name;
 
-          <label for="etat-${index}">État d'avancement</label>
-          <textarea id="etat-${index}" rows="2">${dossier.suiviChantier?.etat || ''}</textarea>
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = folder.checkedStates['suivi-chantier'] || false;
+        checkbox.onchange = () => {
+          updateFolderCheck(folder.id, 'suivi-chantier', checkbox.checked);
+        };
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(' Suivi chantier'));
 
-          <label for="prochaine-${index}">Prochaine étape</label>
-          <input type="text" id="prochaine-${index}" value="${dossier.suiviChantier?.prochaineEtape || ''}"/>
-        `;
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Supprimer';
+        delBtn.onclick = () => {
+          if (confirm(`Voulez-vous vraiment supprimer le dossier "${folder.name}" ?`)) {
+            deleteFolder(folder.id);
+            renderFolders();
+          }
+        };
 
-        const etatInput = div.querySelector(`#etat-${index}`);
-        const prochaineInput = div.querySelector(`#prochaine-${index}`);
-
-        etatInput.addEventListener('input', () => {
-          dossiers[index].suiviChantier.etat = etatInput.value;
-          saveDossiers();
-        });
-
-        prochaineInput.addEventListener('input', () => {
-          dossiers[index].suiviChantier.prochaineEtape = prochaineInput.value;
-          saveDossiers();
-        });
-
-        container.appendChild(div);
+        li.appendChild(nameSpan);
+        li.appendChild(label);
+        li.appendChild(delBtn);
+        foldersList.appendChild(li);
       });
     }
 
-    renderDossiers();
+    renderFolders();
   </script>
 
 </body>
