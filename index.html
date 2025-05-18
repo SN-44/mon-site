@@ -124,8 +124,8 @@
             margin-left: 10px;
             flex-shrink: 0;
             display: flex;
+            flex-direction: column;
             gap: 6px;
-            flex-wrap: wrap;
         }
         .delete-btn, .export-btn {
             background-color: #e74c3c;
@@ -138,11 +138,11 @@
             transition: background-color 0.3s;
             font-size: 14px;
         }
-        .delete-btn:hover {
-            background-color: #c0392b;
-        }
         .export-btn {
             background-color: #007acc;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
         }
         .export-btn:hover {
             background-color: #005a99;
@@ -165,10 +165,6 @@
         @media (max-width: 400px) {
             form button {
                 flex: 1 1 100%;
-            }
-            .actions {
-                flex-direction: column;
-                gap: 5px;
             }
         }
     </style>
@@ -200,16 +196,20 @@
 <script>
     const { jsPDF } = window.jspdf;
 
+    // Récupérer les éléments
     const folderForm = document.getElementById('folder-form');
     const folderNameInput = document.getElementById('folder-name');
     const foldersList = document.getElementById('folders-list');
 
+    // Charger les dossiers depuis localStorage
     let folders = JSON.parse(localStorage.getItem('folders')) || [];
 
+    // Fonction pour sauvegarder dans localStorage
     function saveFolders() {
         localStorage.setItem('folders', JSON.stringify(folders));
     }
 
+    // Fonction pour créer un élément dossier dans la liste
     function createFolderElement(folder) {
         const li = document.createElement('li');
         li.dataset.id = folder.id;
@@ -221,23 +221,19 @@
         const checkboxesDiv = document.createElement('div');
         checkboxesDiv.className = 'checkboxes';
 
-        ['visite-technique', 'suivi-chantier', 'mise-en-service'].forEach(key => {
+        // Création des 3 cases à cocher
+        ['visite technique', 'suivi chantier', 'mise en service'].forEach((labelText, index) => {
+            const idSuffix = ['visite-technique', 'suivi-chantier', 'mise-en-service'][index];
             const label = document.createElement('label');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.checked = folder.checkedStates[key] || false;
-            checkbox.dataset.key = key;
+            checkbox.checked = folder.checkedStates[idSuffix] || false;
+            checkbox.dataset.key = idSuffix;
             checkbox.addEventListener('change', () => {
-                folder.checkedStates[key] = checkbox.checked;
+                folder.checkedStates[idSuffix] = checkbox.checked;
                 saveFolders();
             });
             label.appendChild(checkbox);
-
-            let labelText = '';
-            if(key === 'visite-technique') labelText = 'Visite technique';
-            else if(key === 'suivi-chantier') labelText = 'Suivi chantier';
-            else if(key === 'mise-en-service') labelText = 'Mise en service';
-
             label.appendChild(document.createTextNode(labelText));
             checkboxesDiv.appendChild(label);
         });
@@ -245,7 +241,6 @@
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'actions';
 
-        // Bouton supprimer
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Supprimer';
         deleteBtn.className = 'delete-btn';
@@ -256,14 +251,14 @@
                 renderFolders();
             }
         });
-        actionsDiv.appendChild(deleteBtn);
 
-        // Bouton Export PDF
         const exportBtn = document.createElement('button');
         exportBtn.textContent = 'Exporter PDF';
         exportBtn.className = 'export-btn';
-        exportBtn.addEventListener('click', () => exportFolderPDF(folder));
+        exportBtn.addEventListener('click', () => exportPDF(folder));
+
         actionsDiv.appendChild(exportBtn);
+        actionsDiv.appendChild(deleteBtn);
 
         li.appendChild(nameDiv);
         li.appendChild(checkboxesDiv);
@@ -272,9 +267,10 @@
         return li;
     }
 
+    // Afficher tous les dossiers
     function renderFolders() {
         foldersList.innerHTML = '';
-        if (folders.length === 0) {
+        if(folders.length === 0){
             foldersList.innerHTML = '<p>Aucun dossier créé pour l’instant.</p>';
             return;
         }
@@ -283,10 +279,59 @@
         });
     }
 
+    // Export PDF avec options cochées
+    function exportPDF(folder) {
+        const pdf = new jsPDF();
+
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(12);
+
+        let y = 10;
+        pdf.text(`Dossier : ${folder.name}`, 10, y);
+        y += 10;
+
+        if(folder.checkedStates['visite-technique']) {
+            pdf.setFont(undefined, 'bold');
+            pdf.text("Visite Technique", 10, y);
+            y += 7;
+            pdf.setFont(undefined, 'normal');
+            pdf.text("Contenu de la visite technique ici...", 10, y);
+            y += 12;
+        }
+        if(folder.checkedStates['suivi-chantier']) {
+            pdf.setFont(undefined, 'bold');
+            pdf.text("Suivi de Chantier", 10, y);
+            y += 7;
+            pdf.setFont(undefined, 'normal');
+            pdf.text("Contenu du suivi chantier ici...", 10, y);
+            y += 12;
+        }
+        if(folder.checkedStates['mise-en-service']) {
+            pdf.setFont(undefined, 'bold');
+            pdf.text("Mise en Service", 10, y);
+            y += 7;
+            pdf.setFont(undefined, 'normal');
+            pdf.text("Contenu de la mise en service ici...", 10, y);
+            y += 12;
+        }
+
+        // Création du Blob et lien de téléchargement pour mobile
+        const pdfBlob = pdf.output('blob');
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Dossier_${folder.name}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    // Gérer la création d'un nouveau dossier
     folderForm.addEventListener('submit', e => {
         e.preventDefault();
         const name = folderNameInput.value.trim();
-        if (name === '') return;
+        if(name === '') return;
 
         const newFolder = {
             id: Date.now(),
@@ -304,53 +349,7 @@
         folderNameInput.focus();
     });
 
-    // Fonction d'export PDF en Arial 12, avec uniquement sections cochées
-    function exportFolderPDF(folder) {
-        const pdf = new jsPDF();
-
-        pdf.setFont('helvetica'); // Arial n'est pas dispo par défaut, helvetica est équivalent
-        pdf.setFontSize(12);
-
-        let y = 15;
-        pdf.text(`Dossier : ${folder.name}`, 10, y);
-        y += 10;
-
-        if (folder.checkedStates['visite-technique']) {
-            pdf.setFont(undefined, 'bold');
-            pdf.text('Visite technique', 10, y);
-            y += 8;
-            pdf.setFont(undefined, 'normal');
-            pdf.text('Contenu spécifique de la visite technique...', 10, y); 
-            y += 12;
-        }
-
-        if (folder.checkedStates['suivi-chantier']) {
-            pdf.setFont(undefined, 'bold');
-            pdf.text('Suivi chantier', 10, y);
-            y += 8;
-            pdf.setFont(undefined, 'normal');
-            pdf.text('Contenu spécifique du suivi chantier...', 10, y);
-            y += 12;
-        }
-
-        if (folder.checkedStates['mise-en-service']) {
-            pdf.setFont(undefined, 'bold');
-            pdf.text('Mise en service', 10, y);
-            y += 8;
-            pdf.setFont(undefined, 'normal');
-            pdf.text('Contenu spécifique de la mise en service...', 10, y);
-            y += 12;
-        }
-
-        // Si aucune section cochée, prévenir
-        if (!folder.checkedStates['visite-technique'] && !folder.checkedStates['suivi-chantier'] && !folder.checkedStates['mise-en-service']) {
-            alert('Veuillez cocher au moins un onglet à exporter.');
-            return;
-        }
-
-        pdf.save(`Dossier_${folder.name}.pdf`);
-    }
-
+    // Initial render
     renderFolders();
 </script>
 
