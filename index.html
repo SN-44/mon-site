@@ -115,7 +115,23 @@
 
   <script>
     const { jsPDF } = window.jspdf;
-    let dossiers = JSON.parse(localStorage.getItem('dossiers')) || [];
+    let dossiers = [];
+
+    function chargerDossiers() {
+      try {
+        const data = localStorage.getItem('dossiers');
+        if (data) {
+          dossiers = JSON.parse(data);
+          if (!Array.isArray(dossiers)) throw new Error("Données non valides");
+        } else {
+          dossiers = [];
+        }
+      } catch(e) {
+        console.warn("localStorage 'dossiers' corrompu ou non valide, réinitialisation.", e);
+        localStorage.removeItem('dossiers');
+        dossiers = [];
+      }
+    }
 
     function enregistrer() {
       localStorage.setItem('dossiers', JSON.stringify(dossiers));
@@ -124,7 +140,12 @@
 
     function ajouterDossier() {
       const nom = document.getElementById('dossier-name').value.trim();
-      if (!nom) return;
+      if (!nom) return alert("Le nom du dossier ne peut pas être vide.");
+
+      // Vérifie doublon de nom
+      if (dossiers.some(d => d.nom.toLowerCase() === nom.toLowerCase())) {
+        return alert("Un dossier avec ce nom existe déjà.");
+      }
 
       dossiers.push({
         nom,
@@ -156,11 +177,13 @@
 
       html2canvas(content).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({ margin: 10 });
+        const pdf = new jsPDF();
+        const margin = 10;
+        const pdfWidth = pdf.internal.pageSize.getWidth() - margin * 2;
         const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // margins
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
+
+        pdf.addImage(imgData, 'PNG', margin, margin, pdfWidth, pdfHeight);
         pdf.save(`Dossier_${dossiers[index].nom}.pdf`);
         content.style.display = 'none';
       });
@@ -177,6 +200,7 @@
     }
 
     function renderDossiers() {
+      console.log("Rendu des dossiers", dossiers);
       const container = document.getElementById('dossiers-container');
       container.innerHTML = '';
 
@@ -187,7 +211,7 @@
         div.innerHTML = `
           <h3>${dossier.nom}</h3>
           <button class="toggle-actions" onclick="toggleActions(${index})">\u25BC</button>
-          <div class="actions" id="actions-${index}">
+          <div class="actions" id="actions-${index}" style="display:none;">
             <div class="action-item">
               <label><input type="checkbox" ${dossier.checks.visiteTechnique ? 'checked' : ''} onchange="toggleCheckbox(${index}, 'visiteTechnique')"> Visite technique</label>
               <label><input type="checkbox" ${dossier.checks.suiviChantier ? 'checked' : ''} onchange="toggleCheckbox(${index}, 'suiviChantier')"> Suivi chantier</label>
@@ -217,6 +241,8 @@
       });
     }
 
+    // Chargement initial
+    chargerDossiers();
     renderDossiers();
   </script>
 
