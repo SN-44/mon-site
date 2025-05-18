@@ -5,67 +5,207 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Suivi chantier</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 10px; }
-    ul { padding: 0; list-style: none; }
-    li { padding: 8px 0; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between; }
-    label { display: flex; align-items: center; gap: 5px; }
-    button { margin-left: 10px; background-color: #e74c3c; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-    button:hover { background-color: #c0392b; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background-color: #f9f9f9;
+      line-height: 1.4;
+    }
+    main {
+      max-width: 900px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 7px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    ul#folders-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul#folders-list li {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 15px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    ul#folders-list li:last-child {
+      border-bottom: none;
+    }
+    .folder-name {
+      font-weight: bold;
+      font-size: 18px;
+      flex: 1 1 60%;
+      margin-bottom: 8px;
+    }
+    .inputs {
+      flex: 1 1 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .inputs label {
+      flex: 1 1 45%;
+      font-size: 14px;
+    }
+    .inputs input[type="text"], .inputs input[type="date"] {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .actions {
+      flex-shrink: 0;
+    }
+    .delete-btn {
+      background-color: #e74c3c;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      font-size: 14px;
+    }
+    .delete-btn:hover {
+      background-color: #c0392b;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Suivi de chantier</h1>
+<nav style="background-color:#007acc; padding:10px 0; text-align:center; margin-bottom:20px;">
+  <a href="index.html" 
+     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
+     id="nav-accueil">Accueil</a>
+  <a href="visite-technique.html" 
+     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
+     id="nav-visite">Visite technique</a>
+  <a href="suivi-chantier.html" 
+     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
+     id="nav-suivi">Suivi chantier</a>
+  <a href="mise-en-service.html" 
+     style="color:white; margin: 0 15px; text-decoration:none; font-weight:bold;"
+     id="nav-mise">Mise en service</a>
+</nav>
 
-  <ul id="folders-list"></ul>
-
-  <script src="folders.js"></script>
-  <script>
-    const foldersList = document.getElementById('folders-list');
-
-    function renderFolders() {
-      const folders = loadFolders();
-      foldersList.innerHTML = '';
-
-      if (folders.length === 0) {
-        foldersList.innerHTML = '<li>Aucun dossier créé.</li>';
-        return;
-      }
-
-      folders.forEach(folder => {
-        const li = document.createElement('li');
-
-        const nameSpan = document.createElement('span');
-        nameSpan.textContent = folder.name;
-
-        const label = document.createElement('label');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = folder.checkedStates['suivi-chantier'] || false;
-        checkbox.onchange = () => {
-          updateFolderCheck(folder.id, 'suivi-chantier', checkbox.checked);
-        };
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(' Suivi chantier'));
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = 'Supprimer';
-        delBtn.onclick = () => {
-          if (confirm(`Voulez-vous vraiment supprimer le dossier "${folder.name}" ?`)) {
-            deleteFolder(folder.id);
-            renderFolders();
-          }
-        };
-
-        li.appendChild(nameSpan);
-        li.appendChild(label);
-        li.appendChild(delBtn);
-        foldersList.appendChild(li);
-      });
+<script>
+  const pageMap = {
+    'index.html': 'nav-accueil',
+    'visite-technique.html': 'nav-visite',
+    'suivi-chantier.html': 'nav-suivi',
+    'mise-en-service.html': 'nav-mise',
+  };
+  const currentPage = window.location.pathname.split('/').pop();
+  if (pageMap[currentPage]) {
+    const activeNav = document.getElementById(pageMap[currentPage]);
+    if (activeNav) {
+      activeNav.style.backgroundColor = '#005a99';
+      activeNav.style.padding = '8px 12px';
+      activeNav.style.borderRadius = '4px';
     }
+  }
+</script>
 
-    renderFolders();
-  </script>
+<main>
+  <h1>Suivi chantier</h1>
+  <ul id="folders-list"></ul>
+</main>
+
+<script>
+  const foldersList = document.getElementById('folders-list');
+  let folders = JSON.parse(localStorage.getItem('folders')) || [];
+
+  function saveFolders() {
+    localStorage.setItem('folders', JSON.stringify(folders));
+  }
+
+  function createFolderElement(folder) {
+    const li = document.createElement('li');
+    li.dataset.id = folder.id;
+
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'folder-name';
+    nameDiv.textContent = folder.name;
+
+    const inputsDiv = document.createElement('div');
+    inputsDiv.className = 'inputs';
+
+    // Exemple de champs à renseigner dans suivi chantier
+    // On stocke dans folder.suiviChantier (objet)
+
+    // Date début chantier
+    const dateDebutLabel = document.createElement('label');
+    dateDebutLabel.textContent = 'Date début chantier :';
+    const dateDebutInput = document.createElement('input');
+    dateDebutInput.type = 'date';
+    dateDebutInput.value = folder.suiviChantier?.dateDebut || '';
+    dateDebutInput.addEventListener('change', () => {
+      folder.suiviChantier = folder.suiviChantier || {};
+      folder.suiviChantier.dateDebut = dateDebutInput.value;
+      saveFolders();
+    });
+    dateDebutLabel.appendChild(dateDebutInput);
+
+    // Commentaires chantier
+    const commentLabel = document.createElement('label');
+    commentLabel.textContent = 'Commentaires :';
+    const commentInput = document.createElement('input');
+    commentInput.type = 'text';
+    commentInput.placeholder = 'Commentaires';
+    commentInput.value = folder.suiviChantier?.commentaires || '';
+    commentInput.addEventListener('input', () => {
+      folder.suiviChantier = folder.suiviChantier || {};
+      folder.suiviChantier.commentaires = commentInput.value;
+      saveFolders();
+    });
+    commentLabel.appendChild(commentInput);
+
+    inputsDiv.appendChild(dateDebutLabel);
+    inputsDiv.appendChild(commentLabel);
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'actions';
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Supprimer';
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.addEventListener('click', () => {
+      if (confirm(`Voulez-vous vraiment supprimer le dossier "${folder.name}" ?`)) {
+        folders = folders.filter(f => f.id !== folder.id);
+        saveFolders();
+        renderFolders();
+      }
+    });
+
+    actionsDiv.appendChild(deleteBtn);
+
+    li.appendChild(nameDiv);
+    li.appendChild(inputsDiv);
+    li.appendChild(actionsDiv);
+
+    return li;
+  }
+
+  function renderFolders() {
+    foldersList.innerHTML = '';
+    if (folders.length === 0) {
+      foldersList.innerHTML = '<p>Aucun dossier disponible.</p>';
+      return;
+    }
+    folders.forEach(folder => {
+      foldersList.appendChild(createFolderElement(folder));
+    });
+  }
+
+  renderFolders();
+</script>
 
 </body>
 </html>
