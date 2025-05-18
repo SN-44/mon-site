@@ -109,6 +109,74 @@
     const nomDossierInput = document.getElementById('nomDossier');
     const listeDossiers = document.getElementById('listeDossiers');
 
+    const STORAGE_KEY = 'mesDossiers';
+
+    function chargerDossiers() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return [];
+        try {
+            return JSON.parse(saved);
+        } catch {
+            return [];
+        }
+    }
+
+    function sauvegarderDossiers(dossiers) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dossiers));
+    }
+
+    function afficherListe(dossiers) {
+        listeDossiers.innerHTML = '';
+
+        dossiers.forEach((dossier, index) => {
+            const divDossier = document.createElement('div');
+            divDossier.classList.add('dossier');
+
+            const spanNom = document.createElement('span');
+            spanNom.classList.add('dossier-nom');
+            spanNom.textContent = dossier.nom;
+
+            const casesDiv = document.createElement('div');
+            casesDiv.classList.add('cases');
+
+            const nomsCases = [
+                { id: 'visite-technique', label: 'Visite technique' },
+                { id: 'suivi-chantier', label: 'Suivi de chantier' },
+                { id: 'mise-en-service', label: 'Mise en service' }
+            ];
+
+            nomsCases.forEach(({id, label}) => {
+                const labelEl = document.createElement('label');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = id;
+                checkbox.value = id;
+
+                if (dossier.cocher && dossier.cocher[id]) {
+                    checkbox.checked = true;
+                }
+
+                checkbox.addEventListener('change', () => {
+                    dossier.cocher = dossier.cocher || {};
+                    dossier.cocher[id] = checkbox.checked;
+                    sauvegarderDossiers(dossiers);
+                });
+
+                labelEl.appendChild(checkbox);
+                labelEl.append(' ' + label);
+                casesDiv.appendChild(labelEl);
+            });
+
+            divDossier.appendChild(spanNom);
+            divDossier.appendChild(casesDiv);
+
+            listeDossiers.appendChild(divDossier);
+        });
+    }
+
+    let dossiers = chargerDossiers();
+    afficherListe(dossiers);
+
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -118,40 +186,10 @@
             return;
         }
 
-        // Création du container dossier
-        const divDossier = document.createElement('div');
-        divDossier.classList.add('dossier');
+        dossiers.push({ nom: nom, cocher: {} });
 
-        // Nom du dossier
-        const spanNom = document.createElement('span');
-        spanNom.classList.add('dossier-nom');
-        spanNom.textContent = nom;
-
-        // Création des cases à cocher
-        const casesDiv = document.createElement('div');
-        casesDiv.classList.add('cases');
-
-        const nomsCases = [
-            { id: 'visite-technique', label: 'Visite technique' },
-            { id: 'suivi-chantier', label: 'Suivi de chantier' },
-            { id: 'mise-en-service', label: 'Mise en service' }
-        ];
-
-        nomsCases.forEach(({id, label}) => {
-            const labelEl = document.createElement('label');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.name = id;
-            checkbox.value = id;
-            labelEl.appendChild(checkbox);
-            labelEl.append(' ' + label);
-            casesDiv.appendChild(labelEl);
-        });
-
-        divDossier.appendChild(spanNom);
-        divDossier.appendChild(casesDiv);
-
-        listeDossiers.appendChild(divDossier);
+        sauvegarderDossiers(dossiers);
+        afficherListe(dossiers);
 
         nomDossierInput.value = '';
         nomDossierInput.focus();
