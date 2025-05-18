@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mon Site - Accueil</title>
+    <title>Accueil</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,30 +14,23 @@
             background-color: #007acc;
             padding: 15px 20px;
             color: white;
+            text-align: center;
         }
         nav {
             display: flex;
             background-color: #005a99;
         }
-        nav button {
+        nav a {
             flex: 1;
             padding: 15px 0;
-            background: none;
-            border: none;
             color: white;
+            text-decoration: none;
+            text-align: center;
             font-size: 16px;
-            cursor: pointer;
             transition: background-color 0.3s;
         }
-        nav button:hover {
+        nav a:hover {
             background-color: #004c82;
-        }
-        nav button.active {
-            background-color: #003f6b;
-            font-weight: bold;
-        }
-        main {
-            padding: 20px;
         }
     </style>
 </head>
@@ -48,45 +41,15 @@
 </header>
 
 <nav>
-    <button id="tab1" class="active" onclick="showContent('visite')">Visite technique</button>
-    <button id="tab2" onclick="showContent('suivi')">Suivi de chantier</button>
-    <button id="tab3" onclick="showContent('mise')">Mise en service</button>
+    <a href="visite-technique.html">Visite technique</a>
+    <a href="suivi-chantier.html">Suivi de chantier</a>
+    <a href="mise-en-service.html">Mise en service</a>
 </nav>
 
-<main>
-    <section id="visite" class="content-section">
-        <h2>Visite technique</h2>
-        <p>Contenu détaillé pour la visite technique. Ici, tu peux ajouter des informations, des images, des liens, etc.</p>
-    </section>
-    <section id="suivi" class="content-section" style="display:none;">
-        <h2>Suivi de chantier</h2>
-        <p>Informations et mises à jour concernant le suivi de chantier.</p>
-    </section>
-    <section id="mise" class="content-section" style="display:none;">
-        <h2>Mise en service</h2>
-        <p>Détails sur la mise en service, procédures, contacts, etc.</p>
-    </section>
+<main style="padding: 20px;">
+    <h2>Page d’accueil</h2>
+    <p>Bienvenue sur la page d’accueil. Clique sur un onglet pour accéder à une section spécifique.</p>
 </main>
-
-<script>
-    function showContent(sectionId) {
-        // Cacher toutes les sections
-        document.querySelectorAll('.content-section').forEach(section => {
-            section.style.display = 'none';
-        });
-        // Afficher la section sélectionnée
-        document.getElementById(sectionId).style.display = 'block';
-
-        // Gestion des classes active pour les boutons
-        document.querySelectorAll('nav button').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        // Trouver le bouton correspondant et lui ajouter la classe active
-        if(sectionId === 'visite') document.getElementById('tab1').classList.add('active');
-        else if(sectionId === 'suivi') document.getElementById('tab2').classList.add('active');
-        else if(sectionId === 'mise') document.getElementById('tab3').classList.add('active');
-    }
-</script>
 
 </body>
 </html>
