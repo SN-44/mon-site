@@ -51,7 +51,43 @@
 <main style="padding: 20px;">
     <h2>Page d’accueil</h2>
     <p>Bienvenue sur la page d’accueil. Clique sur un onglet pour accéder à une section spécifique.</p>
+
+    <form id="choixForm">
+        <fieldset>
+            <legend>Choisis les dossiers à afficher :</legend>
+            <label>
+                <input type="checkbox" name="dossier" value="visite-technique" />
+                Visite technique
+            </label><br/>
+            <label>
+                <input type="checkbox" name="dossier" value="suivi-chantier" />
+                Suivi de chantier
+            </label><br/>
+            <label>
+                <input type="checkbox" name="dossier" value="mise-en-service" />
+                Mise en service
+            </label>
+        </fieldset>
+        <br/>
+        <button type="button" onclick="afficherSelection()">Valider</button>
+    </form>
+
+    <div id="resultat" style="margin-top:20px; font-weight:bold;"></div>
+
+    <script>
+        function afficherSelection() {
+            const checkboxes = document.querySelectorAll('input[name="dossier"]:checked');
+            if (checkboxes.length === 0) {
+                document.getElementById('resultat').textContent = "Aucun dossier sélectionné.";
+                return;
+            }
+            const selections = [];
+            checkboxes.forEach(cb => selections.push(cb.nextSibling.textContent.trim()));
+            document.getElementById('resultat').textContent = "Dossiers sélectionnés : " + selections.join(', ');
+        }
+    </script>
 </main>
+
 
 </body>
 </html>
