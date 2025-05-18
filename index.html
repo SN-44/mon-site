@@ -1,5 +1,86 @@
-<script src="folders.js"></script>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Accueil</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; }
+    ul { padding: 0; list-style: none; }
+    li { padding: 8px 0; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between; }
+    button { margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Accueil</h1>
 
+  <form id="folder-form">
+    <input id="folder-name" placeholder="Nom du dossier" required />
+    <button type="submit">Créer dossier</button>
+  </form>
+
+  <ul id="folders-list"></ul>
+
+  <script src="folders.js"></script>
+  <script>
+    const folderForm = document.getElementById('folder-form');
+    const folderNameInput = document.getElementById('folder-name');
+    const foldersList = document.getElementById('folders-list');
+
+    function renderFolders() {
+      const folders = loadFolders();
+      foldersList.innerHTML = '';
+
+      if (folders.length === 0) {
+        foldersList.innerHTML = '<li>Aucun dossier créé.</li>';
+        return;
+      }
+
+      folders.forEach(folder => {
+        const li = document.createElement('li');
+        li.textContent = folder.name;
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Supprimer';
+        delBtn.onclick = () => {
+          if (confirm(`Voulez-vous vraiment supprimer le dossier "${folder.name}" ?`)) {
+            deleteFolder(folder.id);
+            renderFolders();
+          }
+        };
+
+        li.appendChild(delBtn);
+        foldersList.appendChild(li);
+      });
+    }
+
+    folderForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = folderNameInput.value.trim();
+      if (!name) return;
+
+      const folders = loadFolders();
+
+      folders.push({
+        id: Date.now(),
+        name,
+        checkedStates: {
+          'visite-technique': false,
+          'suivi-chantier': false,
+          'mise-en-service': false
+        }
+      });
+
+      saveFolders(folders);
+      renderFolders();
+
+      folderNameInput.value = '';
+      folderNameInput.focus();
+    });
+
+    renderFolders();
+  </script>
+</body>
+</html>
 
 <!DOCTYPE html>
 <html lang="fr">
