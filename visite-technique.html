@@ -129,7 +129,16 @@
     function saveData(index, field, value) {
       folders[index].visiteTechnique = folders[index].visiteTechnique || {};
       folders[index].visiteTechnique[field] = value;
+
+      // Forcing one selection only between droite and gauche
+      if (field === 'acDroite' && value === true) {
+        folders[index].visiteTechnique['acGauche'] = false;
+      } else if (field === 'acGauche' && value === true) {
+        folders[index].visiteTechnique['acDroite'] = false;
+      }
+
       localStorage.setItem('folders', JSON.stringify(folders));
+      render();
     }
 
     async function exportPDF(index) {
@@ -149,9 +158,9 @@
       const vt = folder.visiteTechnique || {};
       pdf.text(`Date de visite technique : ${vt.date || ''}`, 10, y);
       y += 7;
-      pdf.text(`Sortie câble AC - Droite : ${vt.acDroite ? '✔️' : '❌'}`, 10, y);
+      pdf.text(`Sortie câble AC - Droite : ${vt.acDroite ? 'Oui' : 'Non'}`, 10, y);
       y += 7;
-      pdf.text(`Sortie câble AC - Gauche : ${vt.acGauche ? '✔️' : '❌'}`, 10, y);
+      pdf.text(`Sortie câble AC - Gauche : ${vt.acGauche ? 'Oui' : 'Non'}`, 10, y);
 
       pdf.save(`Visite_Technique_${folder.name}.pdf`);
     }
