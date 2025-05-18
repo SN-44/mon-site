@@ -3,91 +3,105 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Accueil</title>
+    <title>Accueil - Gestion des dossiers</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0; padding: 0;
-            background-color: #f9f9f9;
-        }
-        header {
-            background-color: #007acc;
-            padding: 15px 20px;
-            color: white;
-            text-align: center;
-        }
-        nav {
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { margin-bottom: 10px; }
+        #nouveauDossierForm { margin-bottom: 20px; }
+        #listeDossiers { margin-top: 20px; }
+        .dossier {
             display: flex;
-            background-color: #005a99;
+            align-items: center;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
         }
-        nav a {
+        .dossier-nom {
             flex: 1;
-            padding: 15px 0;
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        nav a:hover, nav a.active {
-            background-color: #004c82;
             font-weight: bold;
+        }
+        .cases {
+            display: flex;
+            gap: 15px;
+        }
+        .cases label {
+            user-select: none;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Bienvenue sur mon site</h1>
-</header>
+<h1>Gestion des dossiers</h1>
 
-<nav>
-    <a href="index.html" class="active">Accueil</a>
-    <a href="visite-technique.html">Visite technique</a>
-    <a href="suivi-chantier.html">Suivi de chantier</a>
-    <a href="mise-en-service.html">Mise en service</a>
-</nav>
+<form id="nouveauDossierForm">
+    <input type="text" id="nomDossier" placeholder="Nom du nouveau dossier" required />
+    <button type="submit">Créer dossier</button>
+</form>
 
-<main style="padding: 20px;">
-    <h2>Page d’accueil</h2>
-    <p>Bienvenue sur la page d’accueil. Clique sur un onglet pour accéder à une section spécifique.</p>
+<div id="listeDossiers">
+    <!-- Les dossiers créés apparaîtront ici -->
+</div>
 
-    <form id="choixForm">
-        <fieldset>
-            <legend>Choisis les dossiers à afficher :</legend>
-            <label>
-                <input type="checkbox" name="dossier" value="visite-technique" />
-                Visite technique
-            </label><br/>
-            <label>
-                <input type="checkbox" name="dossier" value="suivi-chantier" />
-                Suivi de chantier
-            </label><br/>
-            <label>
-                <input type="checkbox" name="dossier" value="mise-en-service" />
-                Mise en service
-            </label>
-        </fieldset>
-        <br/>
-        <button type="button" onclick="afficherSelection()">Valider</button>
-    </form>
+<script>
+    const form = document.getElementById('nouveauDossierForm');
+    const nomDossierInput = document.getElementById('nomDossier');
+    const listeDossiers = document.getElementById('listeDossiers');
 
-    <div id="resultat" style="margin-top:20px; font-weight:bold;"></div>
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-    <script>
-        function afficherSelection() {
-            const checkboxes = document.querySelectorAll('input[name="dossier"]:checked');
-            if (checkboxes.length === 0) {
-                document.getElementById('resultat').textContent = "Aucun dossier sélectionné.";
-                return;
-            }
-            const selections = [];
-            checkboxes.forEach(cb => selections.push(cb.nextSibling.textContent.trim()));
-            document.getElementById('resultat').textContent = "Dossiers sélectionnés : " + selections.join(', ');
+        const nom = nomDossierInput.value.trim();
+        if (nom === '') {
+            alert("Le nom du dossier ne peut pas être vide.");
+            return;
         }
-    </script>
-</main>
 
+        // Création du container dossier
+        const divDossier = document.createElement('div');
+        divDossier.classList.add('dossier');
+
+        // Nom du dossier
+        const spanNom = document.createElement('span');
+        spanNom.classList.add('dossier-nom');
+        spanNom.textContent = nom;
+
+        // Création des cases à cocher
+        const casesDiv = document.createElement('div');
+        casesDiv.classList.add('cases');
+
+        const nomsCases = [
+            { id: 'visite-technique', label: 'Visite technique' },
+            { id: 'suivi-chantier', label: 'Suivi de chantier' },
+            { id: 'mise-en-service', label: 'Mise en service' }
+        ];
+
+        nomsCases.forEach(({id, label}) => {
+            const labelEl = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = id;
+            // Pour différencier par dossier, on peut ajouter un identifiant unique (optionnel)
+            checkbox.value = id;
+
+            labelEl.appendChild(checkbox);
+            labelEl.append(' ' + label);
+
+            casesDiv.appendChild(labelEl);
+        });
+
+        // Ajout du nom et des cases dans le dossier
+        divDossier.appendChild(spanNom);
+        divDossier.appendChild(casesDiv);
+
+        // Ajouter le dossier dans la liste
+        listeDossiers.appendChild(divDossier);
+
+        // Reset du formulaire
+        nomDossierInput.value = '';
+        nomDossierInput.focus();
+    });
+</script>
 
 </body>
 </html>
