@@ -47,6 +47,21 @@
       margin-bottom: 10px;
       border-radius: 5px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .actions {
+      display: none;
+      flex-direction: column;
+      margin-top: 10px;
+    }
+    .toggle-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
     }
     label {
       display: block;
@@ -62,7 +77,7 @@
     button {
       padding: 0.5rem 1rem;
       font-size: 1rem;
-      margin-top: 10px;
+      margin-top: 5px;
     }
     @media (max-width: 600px) {
       nav a {
@@ -93,6 +108,7 @@
   </main>
 
   <script>
+    const { jsPDF } = window.jspdf;
     let dossiers = JSON.parse(localStorage.getItem('dossiers')) || [];
 
     function enregistrer() {
@@ -124,15 +140,24 @@
 
     async function exportPDF(index) {
       const content = document.getElementById(`pdf-content-${index}`);
-      const canvas = await html2canvas(content);
-      const imgData = canvas.toDataURL('image/png');
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Dossier_${dossiers[index].nom}.pdf`);
+      content.style.display = 'block';
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      html2canvas(content).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF();
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`Dossier_${dossiers[index].nom}.pdf`);
+        content.style.display = 'none';
+      });
+    }
+
+    function toggleActions(index) {
+      const actionsDiv = document.getElementById(`actions-${index}`);
+      actionsDiv.style.display = actionsDiv.style.display === 'none' ? 'flex' : 'none';
     }
 
     function renderDossiers() {
@@ -145,12 +170,15 @@
 
         div.innerHTML = `
           <h3>${dossier.nom}</h3>
+          <button class="toggle-actions" onclick="toggleActions(${index})">\u25BC</button>
+          <div class="actions" id="actions-${index}">
+            <button onclick="supprimerDossier(${index})">Supprimer</button>
+            <button onclick="exportPDF(${index})">Exporter en PDF</button>
+          </div>
+
           <label><input type="checkbox"> Visite technique</label>
           <label><input type="checkbox"> Suivi chantier</label>
           <label><input type="checkbox"> Mise en service</label>
-          <br />
-          <button onclick="supprimerDossier(${index})">Supprimer</button>
-          <button onclick="exportPDF(${index})">Exporter en PDF</button>
 
           <div id="pdf-content-${index}" style="display: none;">
             <h2>Dossier : ${dossier.nom}</h2>
