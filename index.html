@@ -73,6 +73,7 @@
       display: block;
       margin-top: 10px;
       font-weight: bold;
+      cursor: pointer;
     }
     input[type="text"] {
       width: 100%;
@@ -110,26 +111,36 @@
 
   <main>
     <input type="text" id="dossier-name" placeholder="Nom du dossier" />
-    <button onclick="ajouterDossier()">Créer le dossier</button>
+    <button id="create-btn">Créer le dossier</button>
     <div id="dossiers-container"></div>
   </main>
 
   <script>
     const { jsPDF } = window.jspdf;
-    let dossiers = JSON.parse(localStorage.getItem('dossiers')) || [];
+    let dossiers = [];
 
-    function enregistrer() {
-      localStorage.setItem('dossiers', JSON.stringify(dossiers));
-      renderDossiers();
+    // Charger les dossiers au chargement de la page
+    function chargerDossiers() {
+      const data = localStorage.getItem('dossiers');
+      dossiers = data ? JSON.parse(data) : [];
     }
 
-    function ajouterDossier() {
-      const nom = document.getElementById('dossier-name').value.trim();
-      if (!nom) return alert("Veuillez entrer un nom de dossier.");
+    // Enregistrer les dossiers dans localStorage
+    function enregistrerDossiers() {
+      localStorage.setItem('dossiers', JSON.stringify(dossiers));
+    }
 
-      // Vérifier si un dossier avec ce nom existe déjà
+    // Fonction pour créer un nouveau dossier
+    function ajouterDossier() {
+      const nomInput = document.getElementById('dossier-name');
+      const nom = nomInput.value.trim();
+      if (!nom) {
+        alert("Veuillez entrer un nom de dossier.");
+        return;
+      }
       if (dossiers.some(d => d.nom.toLowerCase() === nom.toLowerCase())) {
-        return alert("Un dossier avec ce nom existe déjà.");
+        alert("Un dossier avec ce nom existe déjà.");
+        return;
       }
 
       dossiers.push({
@@ -144,32 +155,40 @@
         }
       });
 
-      document.getElementById('dossier-name').value = '';
-      enregistrer();
+      nomInput.value = '';
+      enregistrerDossiers();
+      renderDossiers();
     }
 
+    // Supprimer un dossier avec confirmation
     function supprimerDossier(index) {
       if (confirm("Voulez-vous vraiment supprimer ce dossier ?")) {
         dossiers.splice(index, 1);
-        enregistrer();
+        enregistrerDossiers();
+        renderDossiers();
       }
     }
 
+    // Basculer affichage actions
     function toggleActions(index) {
       const actionsDiv = document.getElementById(`actions-${index}`);
-      actionsDiv.style.display = actionsDiv.style.display === 'none' ? 'flex' : 'none';
+      if (!actionsDiv) return;
+      actionsDiv.style.display = actionsDiv.style.display === 'flex' ? 'none' : 'flex';
     }
 
+    // Modifier case cochée
     function toggleCheckbox(index, key) {
       dossiers[index].checks[key] = !dossiers[index].checks[key];
-      enregistrer();
+      enregistrerDossiers();
+      renderDossiers(); // Mise à jour visuelle (notamment pour l'export PDF)
     }
 
+    // Exporter PDF uniquement avec les onglets cochés, Arial 12 (Helvetica)
     function exportPDF(index) {
       const dossier = dossiers[index];
       const pdf = new jsPDF();
 
-      pdf.setFont("helvetica"); // Arial n'est pas dispo, Helvetica proche substitut
+      pdf.setFont("helvetica");
       pdf.setFontSize(12);
 
       let y = 10;
@@ -212,6 +231,7 @@
       pdf.save(`Dossier_${dossier.nom}.pdf`);
     }
 
+    // Afficher les dossiers dans le DOM
     function renderDossiers() {
       const container = document.getElementById('dossiers-container');
       container.innerHTML = '';
@@ -222,7 +242,7 @@
 
         div.innerHTML = `
           <h3>${dossier.nom}</h3>
-          <button class="toggle-actions" onclick="toggleActions(${index})">\u25BC</button>
+          <button class="toggle-actions" aria-label="Afficher options" onclick="toggleActions(${index})">\u25BC</button>
           <div class="actions" id="actions-${index}" style="display:none;">
             <div class="action-item">
               <label><input type="checkbox" ${dossier.checks.visiteTechnique ? 'checked' : ''} onchange="toggleCheckbox(${index}, 'visiteTechnique')"> Visite technique</label>
@@ -238,7 +258,13 @@
       });
     }
 
-    renderDossiers();
+    // Initialisation
+    document.getElementById('create-btn').addEventListener('click', ajouterDossier);
+
+    window.onload = () => {
+      chargerDossiers();
+      renderDossiers();
+    };
   </script>
 
 </body>
