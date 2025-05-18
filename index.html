@@ -41,77 +41,37 @@
       max-width: 900px;
       margin: auto;
     }
-    form {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 1.5rem;
-    }
-    input[type="text"] {
-      flex: 1 1 auto;
-      padding: 10px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    button {
-      padding: 10px 15px;
-      background-color: #007acc;
-      border: none;
-      color: white;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #005fa3;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
+    .dossier {
       background: white;
       padding: 1rem;
       margin-bottom: 10px;
       border-radius: 5px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
     }
-    .folder-name {
-      font-weight: bold;
-      flex: 1 1 auto;
-    }
-    .actions {
+    label {
+      display: block;
       margin-top: 10px;
+      font-weight: bold;
     }
-    .delete-btn {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 1rem;
+      margin-bottom: 10px;
     }
-    .delete-btn:hover {
-      background-color: #c0392b;
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      margin-top: 10px;
     }
     @media (max-width: 600px) {
       nav a {
         flex: 1 1 100%;
       }
-      li {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .actions {
-        align-self: flex-end;
-      }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -127,72 +87,90 @@
   </nav>
 
   <main>
-    <form id="folder-form">
-      <input type="text" id="folder-name" placeholder="Nom du dossier" required />
-      <button type="submit">Créer dossier</button>
-    </form>
-
-    <ul id="folder-list"></ul>
+    <input type="text" id="dossier-name" placeholder="Nom du dossier" />
+    <button onclick="ajouterDossier()">Créer le dossier</button>
+    <div id="dossiers-container"></div>
   </main>
 
   <script>
-    const form = document.getElementById('folder-form');
-    const input = document.getElementById('folder-name');
-    const list = document.getElementById('folder-list');
-
     let dossiers = JSON.parse(localStorage.getItem('dossiers')) || [];
 
-    function saveDossiers() {
+    function enregistrer() {
       localStorage.setItem('dossiers', JSON.stringify(dossiers));
+      renderDossiers();
     }
 
-    function renderDossiers() {
-      list.innerHTML = '';
-      dossiers.forEach(dossier => {
-        const li = document.createElement('li');
-        const name = document.createElement('div');
-        name.className = 'folder-name';
-        name.textContent = dossier.nom;
-
-        const actions = document.createElement('div');
-        actions.className = 'actions';
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = 'Supprimer';
-        delBtn.className = 'delete-btn';
-        delBtn.onclick = () => {
-          if (confirm(`Supprimer le dossier "${dossier.nom}" ?`)) {
-            dossiers = dossiers.filter(d => d.id !== dossier.id);
-            saveDossiers();
-            renderDossiers();
-          }
-        };
-
-        actions.appendChild(delBtn);
-        li.appendChild(name);
-        li.appendChild(actions);
-        list.appendChild(li);
-      });
-    }
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const nom = input.value.trim();
+    function ajouterDossier() {
+      const nom = document.getElementById('dossier-name').value.trim();
       if (!nom) return;
 
-      const newDossier = {
-        id: Date.now(),
-        nom: nom,
+      dossiers.push({
+        nom,
         visiteTechnique: {},
         suiviChantier: {},
         miseEnService: {}
-      };
+      });
 
-      dossiers.push(newDossier);
-      saveDossiers();
-      renderDossiers();
-      input.value = '';
-    });
+      document.getElementById('dossier-name').value = '';
+      enregistrer();
+    }
+
+    function supprimerDossier(index) {
+      if (confirm("Voulez-vous vraiment supprimer ce dossier ?")) {
+        dossiers.splice(index, 1);
+        enregistrer();
+      }
+    }
+
+    async function exportPDF(index) {
+      const content = document.getElementById(`pdf-content-${index}`);
+      const canvas = await html2canvas(content);
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Dossier_${dossiers[index].nom}.pdf`);
+    }
+
+    function renderDossiers() {
+      const container = document.getElementById('dossiers-container');
+      container.innerHTML = '';
+
+      dossiers.forEach((dossier, index) => {
+        const div = document.createElement('div');
+        div.className = 'dossier';
+
+        div.innerHTML = `
+          <h3>${dossier.nom}</h3>
+          <label><input type="checkbox"> Visite technique</label>
+          <label><input type="checkbox"> Suivi chantier</label>
+          <label><input type="checkbox"> Mise en service</label>
+          <br />
+          <button onclick="supprimerDossier(${index})">Supprimer</button>
+          <button onclick="exportPDF(${index})">Exporter en PDF</button>
+
+          <div id="pdf-content-${index}" style="display: none;">
+            <h2>Dossier : ${dossier.nom}</h2>
+            <h3>Visite Technique</h3>
+            <p><strong>Date :</strong> ${dossier.visiteTechnique?.date || ''}</p>
+            <p><strong>Observations :</strong> ${dossier.visiteTechnique?.observations || ''}</p>
+
+            <h3>Suivi de Chantier</h3>
+            <p><strong>État :</strong> ${dossier.suiviChantier?.etat || ''}</p>
+            <p><strong>Prochaine étape :</strong> ${dossier.suiviChantier?.prochaineEtape || ''}</p>
+
+            <h3>Mise en Service</h3>
+            <p><strong>Date :</strong> ${dossier.miseEnService?.date || ''}</p>
+            <p><strong>Commentaire :</strong> ${dossier.miseEnService?.commentaire || ''}</p>
+          </div>
+        `;
+
+        container.appendChild(div);
+      });
+    }
 
     renderDossiers();
   </script>
