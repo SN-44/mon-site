@@ -1,24 +1,22 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visite Technique</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
-      margin: 0; padding: 0;
-      padding-bottom: 60px; /* espace pour bouton en bas */
+      margin: 0;
+      padding: 0;
     }
     header {
       background-color: #007acc;
       padding: 15px;
       color: white;
       text-align: center;
-      font-size: 1.5em;
-      user-select: none;
     }
     nav {
       display: flex;
@@ -31,7 +29,6 @@
       text-decoration: none;
       text-align: center;
       transition: background-color 0.3s;
-      font-size: 1em;
     }
     nav a:hover, nav a.active {
       background-color: #004c82;
@@ -40,40 +37,44 @@
     main {
       max-width: 900px;
       margin: 20px auto;
-      padding: 10px 20px;
+      padding: 20px;
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     .folder {
       border: 1px solid #ccc;
       border-radius: 6px;
-      margin-bottom: 15px;
-      overflow: hidden;
+      margin-bottom: 10px;
     }
     .folder-header {
       background-color: #f1f1f1;
-      padding: 12px 15px;
+      padding: 10px;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      user-select: none;
-      font-weight: bold;
-      font-size: 1.1em;
-    }
-    .folder-header span.arrow {
-      transition: transform 0.3s ease;
-      display: inline-block;
-      margin-left: 8px;
-    }
-    .folder-header.open span.arrow {
-      transform: rotate(180deg);
     }
     .folder-content {
       display: none;
       padding: 15px;
-      border-top: 1px solid #ccc;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="date"], select, textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    textarea {
+      resize: vertical;
     }
     .section-title {
       font-weight: bold;
@@ -86,98 +87,29 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      user-select: none;
-      font-size: 1em;
-    }
-    .section-title span.arrow {
-      transition: transform 0.3s ease;
-      display: inline-block;
-      margin-left: 8px;
-    }
-    .section-title.open span.arrow {
-      transform: rotate(180deg);
     }
     .section-content {
       display: none;
       padding-top: 10px;
-      font-size: 0.95em;
     }
-    .form-group {
-      margin-bottom: 10px;
-    }
-    label {
-      display: block;
-      margin-bottom: 4px;
-      font-weight: normal;
-    }
-    input[type="text"], input[type="date"], select, textarea {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 0.95em;
-      box-sizing: border-box;
-      resize: vertical;
-    }
-    textarea {
-      min-height: 40px;
-    }
-
-    /* Bouton d'impression fixe en bas */
-    #print-btn {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
+    button {
+      padding: 10px 15px;
       background-color: #007acc;
       border: none;
       color: white;
       font-weight: bold;
-      font-size: 1.2em;
-      padding: 12px 25px;
-      border-radius: 30px;
+      border-radius: 4px;
       cursor: pointer;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-      z-index: 1000;
-      user-select: none;
-      width: 90%;
-      max-width: 400px;
+      margin: 5px 5px 0 0;
     }
-    #print-btn:active {
-      background-color: #005a99;
-    }
-
-    /* Responsive : texte plus gros et padding pour smartphone */
-    @media (max-width: 600px) {
-      header {
-        font-size: 1.3em;
-      }
-      nav a {
-        font-size: 0.9em;
-        padding: 12px;
-      }
-      main {
-        margin: 10px 10px 80px 10px;
-        padding: 10px 15px;
-      }
-      .folder-header {
-        font-size: 1em;
-        padding: 10px 12px;
-      }
-      .section-title {
-        font-size: 0.95em;
-        padding: 8px 10px;
-      }
-      #print-btn {
-        font-size: 1.1em;
-        padding: 10px 20px;
-      }
+    button:hover {
+      background-color: #005fa3;
     }
   </style>
 </head>
 <body>
   <header>
-    Visite Technique
+    <h1>Visite Technique</h1>
   </header>
   <nav>
     <a href="index.html">Accueil</a>
@@ -187,76 +119,55 @@
   </nav>
   <main id="folders-container"></main>
 
-  <button id="print-btn" aria-label="Imprimer le rapport PDF">Imprimer PDF</button>
-
   <script>
     const container = document.getElementById('folders-container');
     let folders = JSON.parse(localStorage.getItem('folders')) || [];
 
-    function toggleDisplay(element) {
-      if (element.style.display === 'block') {
-        element.style.display = 'none';
-      } else {
-        element.style.display = 'block';
-      }
-    }
-
-    function toggleFolderContent(index, headerElem) {
+    function toggleContent(index) {
       const content = document.getElementById('content-' + index);
-      toggleDisplay(content);
-      headerElem.classList.toggle('open');
+      content.style.display = content.style.display === 'none' ? 'block' : 'none';
     }
 
-    function toggleSection(sectionId, titleElem) {
-      const sectionContent = document.getElementById(sectionId);
-      toggleDisplay(sectionContent);
-      titleElem.classList.toggle('open');
+    function toggleSection(id) {
+      const section = document.getElementById(id);
+      section.style.display = section.style.display === 'none' ? 'block' : 'none';
     }
 
     function saveData(index, field, value) {
-      if (!folders[index].visiteTechnique) {
-        folders[index].visiteTechnique = {};
-      }
+      folders[index].visiteTechnique = folders[index].visiteTechnique || {};
       folders[index].visiteTechnique[field] = value;
       localStorage.setItem('folders', JSON.stringify(folders));
     }
 
-    function saveDataNested(index, section, field, value) {
-      if (!folders[index].visiteTechnique) {
-        folders[index].visiteTechnique = {};
+    function deleteFolder(index) {
+      if (confirm("Voulez-vous vraiment supprimer ce dossier ?")) {
+        folders.splice(index, 1);
+        localStorage.setItem('folders', JSON.stringify(folders));
+        render();
       }
-      if (!folders[index].visiteTechnique[section]) {
-        folders[index].visiteTechnique[section] = {};
-      }
-      folders[index].visiteTechnique[section][field] = value;
-      localStorage.setItem('folders', JSON.stringify(folders));
     }
 
     function render() {
       container.innerHTML = '';
-
       folders.forEach((folder, index) => {
         const div = document.createElement('div');
         div.className = 'folder';
 
-        // Folder header with toggler arrow (arrow separate from text)
         const header = document.createElement('div');
         header.className = 'folder-header';
-        header.innerHTML = `<span class="folder-name">${folder.name}</span><span class="arrow">▼</span>`;
-        header.onclick = () => toggleFolderContent(index, header);
+        header.innerHTML = `<strong>${folder.name}</strong><span>▼</span>`;
+        header.onclick = () => toggleContent(index);
 
-        // Folder content container
         const content = document.createElement('div');
         content.className = 'folder-content';
         content.id = 'content-' + index;
 
         function createSection(title, sectionId) {
           const section = document.createElement('div');
-
           const sectionTitle = document.createElement('div');
           sectionTitle.className = 'section-title';
-          sectionTitle.innerHTML = `${title} <span class="arrow">▼</span>`;
-          sectionTitle.onclick = () => toggleSection(sectionId, sectionTitle);
+          sectionTitle.innerHTML = `${title} <span>▼</span>`;
+          sectionTitle.onclick = () => toggleSection(sectionId);
 
           const sectionContent = document.createElement('div');
           sectionContent.className = 'section-content';
@@ -268,7 +179,6 @@
           return { section, sectionContent };
         }
 
-        // PLANNING
         const planning = createSection('PLANNING', `planning-${index}`);
         planning.sectionContent.innerHTML = `
           <div class="form-group">
@@ -286,120 +196,104 @@
         `;
         content.appendChild(planning.section);
 
-        // RACCORDEMENT
         const raccordement = createSection('RACCORDEMENT', `raccordement-${index}`);
-        const raccordementValue = folder.visiteTechnique?.raccordement || '';
         raccordement.sectionContent.innerHTML = `
           <div class="form-group">
             <label>Type de raccordement :</label>
-            <select onchange="saveData(${index}, 'raccordement', this.value)">
-              <option value="">-- Sélectionner --</option>
-              <option value="Vente total" ${raccordementValue === 'Vente total' ? 'selected' : ''}>Vente total</option>
-              <option value="Autoconsommation" ${raccordementValue === 'Autoconsommation' ? 'selected' : ''}>Autoconsommation</option>
-              <option value="Vente de surplus" ${raccordementValue === 'Vente de surplus' ? 'selected' : ''}>Vente de surplus</option>
+            <select onchange="saveData(${index}, 'typeRaccordement', this.value)">
+              <option value="">-- Choisir --</option>
+              <option value="Vente total">Vente total</option>
+              <option value="Autoconsommation">Autoconsommation</option>
+              <option value="Vente de surplus">Vente de surplus</option>
             </select>
           </div>
         `;
         content.appendChild(raccordement.section);
 
-        // PUISSANCES
         const puissances = createSection('PUISSANCES', `puissances-${index}`);
-        const puissancesData = folder.visiteTechnique?.puissances || {};
         puissances.sectionContent.innerHTML = `
           <div class="form-group">
             <label>Puissance de raccordement :</label>
-            <textarea rows="1" oninput="saveDataNested(${index}, 'puissances', 'puissanceRaccordement', this.value)">${puissancesData.puissanceRaccordement || ''}</textarea>
+            <textarea rows="2" oninput="saveData(${index}, 'puissanceRaccordement', this.value)">${folder.visiteTechnique?.puissanceRaccordement || ''}</textarea>
           </div>
           <div class="form-group">
             <label>Puissance de projet PV :</label>
-            <textarea rows="1" oninput="saveDataNested(${index}, 'puissances', 'puissanceProjetPV', this.value)">${puissancesData.puissanceProjetPV || ''}</textarea>
+            <textarea rows="2" oninput="saveData(${index}, 'puissanceProjet', this.value)">${folder.visiteTechnique?.puissanceProjet || ''}</textarea>
           </div>
         `;
         content.appendChild(puissances.section);
 
-        // TRAVAUX ENEDIS
-        const travaux = createSection('TRAVAUX ENEDIS', `travaux-${index}`);
-        const travauxData = folder.visiteTechnique?.travaux || {};
+        const travaux = createSection('TRAVAUX ENEDIS', `enedis-${index}`);
         travaux.sectionContent.innerHTML = `
           <div class="form-group">
             <label>PDL posé(s) lors de la VT :</label>
-            <label><input type="radio" name="pdl-${index}" value="oui" ${travauxData.pdlPoses === 'oui' ? 'checked' : ''} onchange="saveDataNested(${index}, 'travaux', 'pdlPoses', this.value)"> Oui</label>
-            <label><input type="radio" name="pdl-${index}" value="non" ${travauxData.pdlPoses === 'non' ? 'checked' : ''} onchange="saveDataNested(${index}, 'travaux', 'pdlPoses', this.value)"> Non</label>
-            <textarea rows="2" placeholder="Commentaires..." oninput="saveDataNested(${index}, 'travaux', 'commentairePDL', this.value)">${travauxData.commentairePDL || ''}</textarea>
+            <input type="radio" name="pdl-${index}" value="oui" onchange="saveData(${index}, 'pdlPose', 'oui')"> Oui
+            <input type="radio" name="pdl-${index}" value="non" onchange="saveData(${index}, 'pdlPose', 'non')"> Non
           </div>
           <div class="form-group">
             <label>Nombre de PDL :</label>
-            <select onchange="saveDataNested(${index}, 'travaux', 'nombrePDL', this.value)">
-              <option value="">-- Sélectionner --</option>
-              <option value="0" ${travauxData.nombrePDL === '0' ? 'selected' : ''}>0</option>
-              <option value="1" ${travauxData.nombrePDL === '1' ? 'selected' : ''}>1</option>
-              <option value="2" ${travauxData.nombrePDL === '2' ? 'selected' : ''}>2</option>
-              <option value="3" ${travauxData.nombrePDL === '3' ? 'selected' : ''}>3</option>
+            <select onchange="saveData(${index}, 'nombrePDL', this.value)">
+              <option value="">-- Choisir --</option>
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
             </select>
           </div>
         `;
         content.appendChild(travaux.section);
 
-       // CATEGORIE DU BATIMENT
-const categorie = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`);
-const categorieData = folder.visiteTechnique?.categorie || {};
-categorie.sectionContent.innerHTML = `
-  <div class="form-group">
-    <label>Type de bâtiment :</label>
-    <input type="text" value="${categorieData.typeBatiment || ''}" onchange="saveDataNested(${index}, 'categorie', 'typeBatiment', this.value)">
-  </div>
-  <div class="form-group">
-    <label>
-      <input type="checkbox" ${categorieData.classe ? 'checked' : ''} onchange="saveDataNested(${index}, 'categorie', 'classe', this.checked)">
-      Classé
-    </label>
-  </div>
-`;
-
+        const categorie = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`);
+        categorie.sectionContent.innerHTML = `
+          <div class="form-group">
+            <label>Type de bâtiment :</label>
+            <select onchange="saveData(${index}, 'typeBatiment', this.value)">
+              <option value="">-- Choisir --</option>
+              <option value="Agricole">Agricole</option>
+              <option value="Industriel">Industriel</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Classé :</label>
+            <select onchange="saveData(${index}, 'classement', this.value)">
+              <option value="">-- Choisir --</option>
+              <option value="ICPE">ICPE</option>
+              <option value="ERP">ERP</option>
+              <option value="ERT">ERT</option>
+            </select>
+          </div>
+        `;
         content.appendChild(categorie.section);
 
+        const printButton = document.createElement('button');
+        printButton.textContent = 'Imprimer ce dossier';
+        printButton.onclick = () => {
+          const element = document.createElement('div');
+          element.innerHTML = `<h2>${folder.name}</h2>` + content.innerHTML;
+          const opt = {
+            margin:       0.5,
+            filename:     `${folder.name}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+          };
+          html2pdf().from(element).set(opt).save();
+        };
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Supprimer ce dossier';
+        deleteButton.style.backgroundColor = '#cc0000';
+        deleteButton.onclick = () => deleteFolder(index);
+
+        content.appendChild(printButton);
+        content.appendChild(deleteButton);
         div.appendChild(header);
         div.appendChild(content);
         container.appendChild(div);
       });
     }
 
-    // Init par défaut si pas de dossiers
-    if (folders.length === 0) {
-      folders = [
-        { name: 'Dossier A', visiteTechnique: {} },
-        { name: 'Dossier B', visiteTechnique: {} },
-      ];
-      localStorage.setItem('folders', JSON.stringify(folders));
-    }
-
     render();
-
-    // Fonction impression PDF via html2pdf
-    document.getElementById('print-btn').addEventListener('click', () => {
-      // On clone le container pour retirer éléments inutiles pour impression
-      const printContent = container.cloneNode(true);
-
-      // On affiche tous les dossiers et sections dépliés pour impression
-      printContent.querySelectorAll('.folder-content').forEach(div => div.style.display = 'block');
-      printContent.querySelectorAll('.section-content').forEach(div => div.style.display = 'block');
-      printContent.querySelectorAll('.folder-header').forEach(hdr => hdr.classList.add('open'));
-      printContent.querySelectorAll('.section-title').forEach(title => title.classList.add('open'));
-
-      const opt = {
-        margin: 0.5,
-        filename: 'rapport-visite-technique.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-      };
-
-      html2pdf().set(opt).from(printContent).save();
-    });
-
-    // Expose fonctions globalement pour inline events
-    window.saveData = saveData;
-    window.saveDataNested = saveDataNested;
   </script>
 </body>
 </html>
