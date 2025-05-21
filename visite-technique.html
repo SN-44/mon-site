@@ -238,8 +238,8 @@
 
     // PLANNING
     createPrintSection('PLANNING', `
-      <p><strong>Intervention en :</strong> ${vt.interventionEn || ''}</p>
-      <p><strong>Equipe :</strong> ${vt.equipe || ''}</p>
+<label>Intervention en :</label>
+<input type="date" value="${folder.visiteTechnique?.interventionEn || ''}" onchange="saveData(${index}, 'interventionEn', this.value)">
       <p><strong>Contact chef d\'équipe :</strong> ${vt.contactChefEquipe || ''}</p>
     `);
 
