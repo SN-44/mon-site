@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visite Technique</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
     }
     header {
       background-color: #007acc;
@@ -38,7 +39,7 @@
       padding: 20px;
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     .folder {
       border: 1px solid #ccc;
@@ -52,7 +53,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      user-select: none;
     }
     .folder-content {
       display: none;
@@ -72,23 +72,19 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    .checkbox-row {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-top: 10px;
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
     }
-    .checkbox-row label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: normal;
-      cursor: pointer;
-    }
-    .checkbox-row input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
+    .section-title {
+      font-weight: bold;
+      color: black;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 16px;
     }
     button {
       padding: 10px 15px;
@@ -117,55 +113,19 @@
   </nav>
   <main id="folders-container"></main>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const container = document.getElementById('folders-container');
     const folders = JSON.parse(localStorage.getItem('folders')) || [];
 
-    // On stocke l'état d'ouverture des dossiers
-    const openedFolders = new Set();
-
     function toggleContent(index) {
       const content = document.getElementById('content-' + index);
-      if (content.style.display === 'block') {
-        content.style.display = 'none';
-        openedFolders.delete(index);
-      } else {
-        content.style.display = 'block';
-        openedFolders.add(index);
-      }
+      content.style.display = content.style.display === 'none' ? 'block' : 'none';
     }
 
     function saveData(index, field, value) {
       folders[index].visiteTechnique = folders[index].visiteTechnique || {};
       folders[index].visiteTechnique[field] = value;
       localStorage.setItem('folders', JSON.stringify(folders));
-    }
-
-    function exportPDF(index) {
-      const folder = folders[index];
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      pdf.setFont("Arial");
-      pdf.setFontSize(12);
-
-      let y = 10;
-      pdf.text(`Dossier : ${folder.name}`, 10, y);
-      y += 10;
-      pdf.setFont(undefined, 'bold');
-      pdf.text("Visite Technique", 10, y);
-      pdf.setFont(undefined, 'normal');
-      y += 7;
-      const vt = folder.visiteTechnique || {};
-      pdf.text(`Date de visite technique : ${vt.date || ''}`, 10, y);
-      y += 7;
-      pdf.text(`Sortie câble AC : `, 10, y);
-      const acDroite = vt.acDroite ? 'Droite' : '';
-      const acGauche = vt.acGauche ? 'Gauche' : '';
-      const acText = [acDroite, acGauche].filter(Boolean).join(' ou ') || 'Aucune';
-      pdf.text(acText, 60, y);
-
-      pdf.save(`Visite_Technique_${folder.name}.pdf`);
     }
 
     function render() {
@@ -182,84 +142,42 @@
         const content = document.createElement('div');
         content.className = 'folder-content';
         content.id = 'content-' + index;
-        content.style.display = openedFolders.has(index) ? 'block' : 'none';
 
-        // Date visite technique
-        const dateGroup = document.createElement('div');
-        dateGroup.className = 'form-group';
-        dateGroup.innerHTML = '<label>Date de visite technique</label>';
-        const dateInput = document.createElement('input');
-        dateInput.type = 'date';
-        dateInput.value = folder.visiteTechnique?.date || '';
-        dateInput.onchange = (e) => {
-          e.stopPropagation();
-          saveData(index, 'date', e.target.value);
-        }
-        dateInput.onclick = (e) => e.stopPropagation();
-        dateGroup.appendChild(dateInput);
+        const planningTitle = document.createElement('div');
+        planningTitle.className = 'section-title';
+        planningTitle.textContent = 'PLANNING';
 
-        // Sortie câble AC
-        const checkboxTitle = document.createElement('label');
-        checkboxTitle.textContent = 'Sortie câble AC';
+        const interventionGroup = document.createElement('div');
+        interventionGroup.className = 'form-group';
+        interventionGroup.innerHTML = '<label>Intervention en :</label>';
+        const interventionInput = document.createElement('input');
+        interventionInput.type = 'date';
+        interventionInput.value = folder.visiteTechnique?.intervention || '';
+        interventionInput.onchange = (e) => saveData(index, 'intervention', e.target.value);
+        interventionGroup.appendChild(interventionInput);
 
-        const checkboxRow = document.createElement('div');
-        checkboxRow.className = 'checkbox-row';
+        const equipeGroup = document.createElement('div');
+        equipeGroup.className = 'form-group';
+        equipeGroup.innerHTML = '<label>Équipe :</label>';
+        const equipeTextarea = document.createElement('textarea');
+        equipeTextarea.rows = 2;
+        equipeTextarea.value = folder.visiteTechnique?.equipe || '';
+        equipeTextarea.oninput = (e) => saveData(index, 'equipe', e.target.value);
+        equipeGroup.appendChild(equipeTextarea);
 
-        // Droite checkbox
-        const droiteLabel = document.createElement('label');
-        droiteLabel.textContent = 'Droite';
-        const droiteCheckbox = document.createElement('input');
-        droiteCheckbox.type = 'checkbox';
-        droiteCheckbox.checked = folder.visiteTechnique?.acDroite || false;
-        droiteCheckbox.onchange = (e) => {
-          e.stopPropagation();
-          if(e.target.checked) {
-            saveData(index, 'acDroite', true);
-            saveData(index, 'acGauche', false);
-            // Ne pas re-render, on met juste à jour l'état visible
-            gaucheCheckbox.checked = false;
-          } else {
-            saveData(index, 'acDroite', false);
-          }
-        }
-        droiteCheckbox.onclick = (e) => e.stopPropagation();
-        droiteLabel.appendChild(droiteCheckbox);
+        const contactGroup = document.createElement('div');
+        contactGroup.className = 'form-group';
+        contactGroup.innerHTML = '<label>Contact chef d\'équipe :</label>';
+        const contactTextarea = document.createElement('textarea');
+        contactTextarea.rows = 2;
+        contactTextarea.value = folder.visiteTechnique?.contact || '';
+        contactTextarea.oninput = (e) => saveData(index, 'contact', e.target.value);
+        contactGroup.appendChild(contactTextarea);
 
-        // Gauche checkbox
-        const gaucheLabel = document.createElement('label');
-        gaucheLabel.textContent = 'Gauche';
-        const gaucheCheckbox = document.createElement('input');
-        gaucheCheckbox.type = 'checkbox';
-        gaucheCheckbox.checked = folder.visiteTechnique?.acGauche || false;
-        gaucheCheckbox.onchange = (e) => {
-          e.stopPropagation();
-          if(e.target.checked) {
-            saveData(index, 'acGauche', true);
-            saveData(index, 'acDroite', false);
-            // Ne pas re-render, on met juste à jour l'état visible
-            droiteCheckbox.checked = false;
-          } else {
-            saveData(index, 'acGauche', false);
-          }
-        }
-        gaucheCheckbox.onclick = (e) => e.stopPropagation();
-        gaucheLabel.appendChild(gaucheCheckbox);
-
-        checkboxRow.appendChild(droiteLabel);
-        checkboxRow.appendChild(gaucheLabel);
-
-        // Bouton export
-        const exportBtn = document.createElement('button');
-        exportBtn.textContent = 'Exporter en PDF';
-        exportBtn.onclick = (e) => {
-          e.stopPropagation();
-          exportPDF(index);
-        }
-
-        content.appendChild(dateGroup);
-        content.appendChild(checkboxTitle);
-        content.appendChild(checkboxRow);
-        content.appendChild(exportBtn);
+        content.appendChild(planningTitle);
+        content.appendChild(interventionGroup);
+        content.appendChild(equipeGroup);
+        content.appendChild(contactGroup);
 
         div.appendChild(header);
         div.appendChild(content);
