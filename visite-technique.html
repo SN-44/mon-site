@@ -238,8 +238,8 @@
 
     // PLANNING
     createPrintSection('PLANNING', `
-    <label>Intervention en :</label>
-    <input type="date" value="${folder.visiteTechnique?.interventionEn || ''}" onchange="saveData(${index}, 'interventionEn', this.value)">
+      <p><strong>Intervention en :</strong> ${vt.interventionEn || ''}</p>
+      <p><strong>Equipe :</strong> ${vt.equipe || ''}</p>
       <p><strong>Contact chef d\'équipe :</strong> ${vt.contactChefEquipe || ''}</p>
     `);
 
@@ -307,124 +307,194 @@
       content.id = 'content-' + index;
 
       // PLANNING section
-      const planningSection = createSection('PLANNING', `planning-${index}`, index);
-      planningSection.sectionContent.innerHTML = `
+      const planningTitle = document.createElement('div');
+      planningTitle.className = 'section-title';
+      planningTitle.id = `planning-title-${index}`;
+      planningTitle.innerHTML = `PLANNING <span>▼</span>`;
+      planningTitle.onclick = () => toggleSection(`planning-${index}`);
+      const planningContent = document.createElement('div');
+      planningContent.className = 'section-content';
+      planningContent.id = `planning-${index}`;
+      planningContent.innerHTML = `
         <div class="form-group">
           <label>Intervention en :</label>
-          <input type="text" value="${folder.visiteTechnique?.interventionEn || ''}" onchange="saveData(${index}, 'interventionEn', this.value)">
+          <input type="date" value="${folder.visiteTechnique?.interventionEn || ''}" onchange="saveData(${index}, 'interventionEn', this.value)" />
         </div>
         <div class="form-group">
           <label>Equipe :</label>
-          <input type="text" value="${folder.visiteTechnique?.equipe || ''}" onchange="saveData(${index}, 'equipe', this.value)">
+          <input type="text" value="${folder.visiteTechnique?.equipe || ''}" onchange="saveData(${index}, 'equipe', this.value)" />
         </div>
         <div class="form-group">
           <label>Contact chef d'équipe :</label>
-          <input type="text" value="${folder.visiteTechnique?.contactChefEquipe || ''}" onchange="saveData(${index}, 'contactChefEquipe', this.value)">
+          <input type="text" value="${folder.visiteTechnique?.contactChefEquipe || ''}" onchange="saveData(${index}, 'contactChefEquipe', this.value)" />
         </div>
       `;
-      content.appendChild(planningSection.section);
+      planningContent.style.display = 'none';
 
       // RACCORDEMENT section
-      const raccordementSection = createSection('RACCORDEMENT', `raccordement-${index}`, index);
-      raccordementSection.sectionContent.innerHTML = `
+      const raccordementTitle = document.createElement('div');
+      raccordementTitle.className = 'section-title';
+      raccordementTitle.id = `raccordement-title-${index}`;
+      raccordementTitle.innerHTML = `RACCORDEMENT <span>▼</span>`;
+      raccordementTitle.onclick = () => toggleSection(`raccordement-${index}`);
+      const raccordementContent = document.createElement('div');
+      raccordementContent.className = 'section-content';
+      raccordementContent.id = `raccordement-${index}`;
+      raccordementContent.innerHTML = `
         <div class="form-group">
           <label>Type de raccordement :</label>
-          <input type="text" value="${folder.visiteTechnique?.typeRaccordement || ''}" onchange="saveData(${index}, 'typeRaccordement', this.value)">
+          <input type="text" value="${folder.visiteTechnique?.typeRaccordement || ''}" onchange="saveData(${index}, 'typeRaccordement', this.value)" />
         </div>
       `;
-      content.appendChild(raccordementSection.section);
+      raccordementContent.style.display = 'none';
 
       // PUISSANCES section
-      const puissancesSection = createSection('PUISSANCES', `puissances-${index}`, index);
-      puissancesSection.sectionContent.innerHTML = `
+      const puissancesTitle = document.createElement('div');
+      puissancesTitle.className = 'section-title';
+      puissancesTitle.id = `puissances-title-${index}`;
+      puissancesTitle.innerHTML = `PUISSANCES <span>▼</span>`;
+      puissancesTitle.onclick = () => toggleSection(`puissances-${index}`);
+      const puissancesContent = document.createElement('div');
+      puissancesContent.className = 'section-content';
+      puissancesContent.id = `puissances-${index}`;
+      puissancesContent.innerHTML = `
         <div class="form-group">
           <label>Puissance de raccordement :</label>
-          <input type="text" value="${folder.visiteTechnique?.puissanceRaccordement || ''}" onchange="saveData(${index}, 'puissanceRaccordement', this.value)">
+          <input type="text" value="${folder.visiteTechnique?.puissanceRaccordement || ''}" onchange="saveData(${index}, 'puissanceRaccordement', this.value)" />
         </div>
         <div class="form-group">
           <label>Puissance de projet PV :</label>
-          <input type="text" value="${folder.visiteTechnique?.puissanceProjetPV || ''}" onchange="saveData(${index}, 'puissanceProjetPV', this.value)">
+          <input type="text" value="${folder.visiteTechnique?.puissanceProjetPV || ''}" onchange="saveData(${index}, 'puissanceProjetPV', this.value)" />
         </div>
       `;
-      content.appendChild(puissancesSection.section);
+      puissancesContent.style.display = 'none';
 
-      // TRAVAUX ENEDIS section with exclusive checkboxes
-      const travauxEnedisSection = createSection('TRAVAUX ENEDIS', `travauxEnedis-${index}`, index);
-      travauxEnedisSection.sectionContent.innerHTML = `
-        <div class="checkbox-group">
-          <label>
-            PDL posé(s) lors de la VT Oui
-            <input type="checkbox" onchange="travauxEnedisToggle(${index}, 'pdlPoseOui')" ${folder.visiteTechnique?.pdlPoseOui ? 'checked' : ''}>
-          </label>
-          <label>
-            PDL posé(s) lors de la VT Non
-            <input type="checkbox" onchange="travauxEnedisToggle(${index}, 'pdlPoseNon')" ${folder.visiteTechnique?.pdlPoseNon ? 'checked' : ''}>
-          </label>
-        </div>
+      // TRAVAUX ENEDIS section
+      const travauxTitle = document.createElement('div');
+      travauxTitle.className = 'section-title';
+      travauxTitle.id = `travaux-title-${index}`;
+      travauxTitle.innerHTML = `TRAVAUX ENEDIS <span>▼</span>`;
+      travauxTitle.onclick = () => toggleSection(`travaux-${index}`);
+      const travauxContent = document.createElement('div');
+      travauxContent.className = 'section-content checkbox-group';
+      travauxContent.id = `travaux-${index}`;
+      travauxContent.innerHTML = `
+        <label>PDL posé(s) lors de la VT
+          <input
+            type="checkbox"
+            onchange="travauxEnedisToggle(${index}, 'pdlPoseOui')"
+            ${folder.visiteTechnique?.pdlPoseOui ? 'checked' : ''}
+          />
+          Oui
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            onchange="travauxEnedisToggle(${index}, 'pdlPoseNon')"
+            ${folder.visiteTechnique?.pdlPoseNon ? 'checked' : ''}
+          />
+          Non
+        </label>
       `;
-      content.appendChild(travauxEnedisSection.section);
+      travauxContent.style.display = 'none';
 
       // CATEGORIE DU BATIMENT section
-      const categorieSection = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`, index);
-      categorieSection.sectionContent.innerHTML = `
+      const catBatimentTitle = document.createElement('div');
+      catBatimentTitle.className = 'section-title';
+      catBatimentTitle.id = `catBatiment-title-${index}`;
+      catBatimentTitle.innerHTML = `CATEGORIE DU BATIMENT <span>▼</span>`;
+      catBatimentTitle.onclick = () => toggleSection(`catBatiment-${index}`);
+      const catBatimentContent = document.createElement('div');
+      catBatimentContent.className = 'section-content';
+      catBatimentContent.id = `catBatiment-${index}`;
+      catBatimentContent.innerHTML = `
         <div class="form-group">
           <label>Type de bâtiment :</label>
-          <select onchange="saveData(${index}, 'typeBatiment', this.value)">
-            <option value="" ${!folder.visiteTechnique?.typeBatiment ? 'selected' : ''}>-- Choisir --</option>
-            <option value="Agricole" ${folder.visiteTechnique?.typeBatiment === 'Agricole' ? 'selected' : ''}>Agricole</option>
-            <option value="Industriel" ${folder.visiteTechnique?.typeBatiment === 'Industriel' ? 'selected' : ''}>Industriel</option>
-          </select>
+          <input type="text" value="${folder.visiteTechnique?.typeBatiment || ''}" onchange="saveData(${index}, 'typeBatiment', this.value)" />
         </div>
         <div class="form-group">
           <label>Classé :</label>
-          <select onchange="saveData(${index}, 'classement', this.value)">
-            <option value="" ${!folder.visiteTechnique?.classement ? 'selected' : ''}>-- Choisir --</option>
-            <option value="ICPE" ${folder.visiteTechnique?.classement === 'ICPE' ? 'selected' : ''}>ICPE</option>
-            <option value="ERP" ${folder.visiteTechnique?.classement === 'ERP' ? 'selected' : ''}>ERP</option>
-            <option value="ERT" ${folder.visiteTechnique?.classement === 'ERT' ? 'selected' : ''}>ERT</option>
-          </select>
+          <input type="text" value="${folder.visiteTechnique?.classement || ''}" onchange="saveData(${index}, 'classement', this.value)" />
         </div>
       `;
-      content.appendChild(categorieSection.section);
+      catBatimentContent.style.display = 'none';
 
       // DATE DE VISITE TECHNIQUE section
-      const dateVisiteSection = createSection('DATE DE VISITE TECHNIQUE', `dateVisite-${index}`, index);
-      dateVisiteSection.sectionContent.innerHTML = `
+      const dateVisiteTitle = document.createElement('div');
+      dateVisiteTitle.className = 'section-title';
+      dateVisiteTitle.id = `dateVisite-title-${index}`;
+      dateVisiteTitle.innerHTML = `DATE DE VISITE TECHNIQUE <span>▼</span>`;
+      dateVisiteTitle.onclick = () => toggleSection(`dateVisite-${index}`);
+      const dateVisiteContent = document.createElement('div');
+      dateVisiteContent.className = 'section-content';
+      dateVisiteContent.id = `dateVisite-${index}`;
+      dateVisiteContent.innerHTML = `
         <div class="form-group">
           <label>Date de la visite :</label>
-          <input type="date" value="${folder.visiteTechnique?.dateVisite || ''}" onchange="saveData(${index}, 'dateVisite', this.value)">
+          <input type="date" value="${folder.visiteTechnique?.dateVisite || ''}" onchange="saveData(${index}, 'dateVisite', this.value)" />
         </div>
       `;
-      content.appendChild(dateVisiteSection.section);
+      dateVisiteContent.style.display = 'none';
 
       // SORTIE CÂBLE AC section
-      const sortieACSection = createSection('SORTIE CÂBLE AC', `sortieAC-${index}`, index);
-      sortieACSection.sectionContent.innerHTML = `
-        <div class="checkbox-group">
-          <label>
-            Droite
-            <input type="checkbox" onchange="saveData(${index}, 'sortieACDroite', this.checked)" ${folder.visiteTechnique?.sortieACDroite ? 'checked' : ''}>
-          </label>
-          <label>
-            Gauche
-            <input type="checkbox" onchange="saveData(${index}, 'sortieACGauche', this.checked)" ${folder.visiteTechnique?.sortieACGauche ? 'checked' : ''}>
-          </label>
-        </div>
+      const sortieACTitle = document.createElement('div');
+      sortieACTitle.className = 'section-title';
+      sortieACTitle.id = `sortieAC-title-${index}`;
+      sortieACTitle.innerHTML = `SORTIE CÂBLE AC <span>▼</span>`;
+      sortieACTitle.onclick = () => toggleSection(`sortieAC-${index}`);
+      const sortieACContent = document.createElement('div');
+      sortieACContent.className = 'section-content checkbox-group';
+      sortieACContent.id = `sortieAC-${index}`;
+      sortieACContent.innerHTML = `
+        <label>Droite
+          <input
+            type="checkbox"
+            onchange="saveData(${index}, 'sortieACDroite', this.checked)"
+            ${folder.visiteTechnique?.sortieACDroite ? 'checked' : ''}
+          />
+        </label>
+        <label>Gauche
+          <input
+            type="checkbox"
+            onchange="saveData(${index}, 'sortieACGauche', this.checked)"
+            ${folder.visiteTechnique?.sortieACGauche ? 'checked' : ''}
+          />
+        </label>
       `;
-      content.appendChild(sortieACSection.section);
+      sortieACContent.style.display = 'none';
 
-      // Buttons print & delete
+      // Buttons container
+      const btnContainer = document.createElement('div');
+      btnContainer.style.marginTop = '15px';
+
       const printBtn = document.createElement('button');
-      printBtn.textContent = 'Imprimer ce dossier';
+      printBtn.textContent = 'Imprimer / Exporter PDF';
       printBtn.onclick = () => printFolder(index);
 
       const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = 'Supprimer ce dossier';
+      deleteBtn.textContent = 'Supprimer';
       deleteBtn.className = 'delete';
       deleteBtn.onclick = () => deleteFolder(index);
 
-      content.appendChild(printBtn);
-      content.appendChild(deleteBtn);
+      btnContainer.appendChild(printBtn);
+      btnContainer.appendChild(deleteBtn);
+
+      // Append all sections to content
+      content.appendChild(planningTitle);
+      content.appendChild(planningContent);
+      content.appendChild(raccordementTitle);
+      content.appendChild(raccordementContent);
+      content.appendChild(puissancesTitle);
+      content.appendChild(puissancesContent);
+      content.appendChild(travauxTitle);
+      content.appendChild(travauxContent);
+      content.appendChild(catBatimentTitle);
+      content.appendChild(catBatimentContent);
+      content.appendChild(dateVisiteTitle);
+      content.appendChild(dateVisiteContent);
+      content.appendChild(sortieACTitle);
+      content.appendChild(sortieACContent);
+      content.appendChild(btnContainer);
 
       div.appendChild(header);
       div.appendChild(content);
@@ -432,37 +502,8 @@
     });
   }
 
-  // Helper: create section with toggle
-  function createSection(title, id, folderIndex) {
-    const section = document.createElement('div');
-
-    const sectionTitle = document.createElement('div');
-    sectionTitle.className = 'section-title';
-    sectionTitle.id = id + '-title';
-    sectionTitle.innerHTML = `${title} <span>▼</span>`;
-    sectionTitle.onclick = () => toggleSection(id);
-
-    const sectionContent = document.createElement('div');
-    sectionContent.className = 'section-content';
-    sectionContent.id = id;
-
-    section.appendChild(sectionTitle);
-    section.appendChild(sectionContent);
-
-    return {section, sectionContent};
-  }
-
-  // Load initial folders or example if none
-  if(folders.length === 0) {
-    folders.push({name: "Exemple de dossier", visiteTechnique: {}});
-    localStorage.setItem('folders', JSON.stringify(folders));
-  }
-
+  // Initial render
   render();
-
-  // Expose saveData and travauxEnedisToggle to global scope for inline onchange handlers
-  window.saveData = saveData;
-  window.travauxEnedisToggle = travauxEnedisToggle;
 </script>
 </body>
 </html>
