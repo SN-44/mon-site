@@ -42,6 +42,24 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+    #print-btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      font-weight: bold;
+      font-size: 16px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      transition: background-color 0.3s;
+    }
+    #print-btn:hover {
+      background-color: #218838;
+    }
     .folder {
       border: 1px solid #ccc;
       border-radius: 6px;
@@ -108,24 +126,17 @@
     .section-title.expanded .arrow {
       transform: rotate(180deg);
     }
-    button {
-      padding: 10px 15px;
-      background-color: #007acc;
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #005fa3;
-    }
     /* Impression */
     @media print {
+      #print-btn {
+        display: none !important;
+      }
       .folder-header,
       .section-title {
         display: flex !important;
+        background-color: transparent !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
       }
       .folder-header .arrow,
       .section-title .arrow {
@@ -133,6 +144,13 @@
       }
       .folder-content {
         display: block !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      body {
+        background: white !important;
+        margin: 0 !important;
       }
     }
   </style>
@@ -147,13 +165,15 @@
     <a href="suivi-chantier.html">Suivi de chantier</a>
     <a href="mise-en-service.html">Mise en service</a>
   </nav>
-  <main id="folders-container"></main>
+  <main>
+    <button id="print-btn" onclick="window.print()">🖨️ Imprimer le dossier</button>
+    <div id="folders-container"></div>
+  </main>
 
   <script>
     const container = document.getElementById('folders-container');
     const folders = JSON.parse(localStorage.getItem('folders')) || [];
 
-    // Toggle dossier content visibility
     function toggleContent(index) {
       const content = document.getElementById('content-' + index);
       const header = document.getElementById('header-' + index);
@@ -166,7 +186,6 @@
       }
     }
 
-    // Toggle section content visibility inside a folder
     function toggleSection(folderIndex, sectionId) {
       const sectionContent = document.getElementById(`section-content-${folderIndex}-${sectionId}`);
       const sectionTitle = document.getElementById(`section-title-${folderIndex}-${sectionId}`);
@@ -179,33 +198,29 @@
       }
     }
 
-    // Save data in localStorage
     function saveData(folderIndex, field, value) {
       folders[folderIndex].visiteTechnique = folders[folderIndex].visiteTechnique || {};
       folders[folderIndex].visiteTechnique[field] = value;
       localStorage.setItem('folders', JSON.stringify(folders));
     }
 
-    // Render folders and their content
     function render() {
       container.innerHTML = '';
       folders.forEach((folder, folderIndex) => {
         const div = document.createElement('div');
         div.className = 'folder';
 
-        // Dossier header with arrow span
         const header = document.createElement('div');
         header.className = 'folder-header';
         header.id = `header-${folderIndex}`;
         header.innerHTML = `<span>${folder.name}</span><span class="arrow">▼</span>`;
         header.onclick = () => toggleContent(folderIndex);
 
-        // Folder content container
         const content = document.createElement('div');
         content.className = 'folder-content';
         content.id = 'content-' + folderIndex;
 
-        // *** PLANNING Section ***
+        // PLANNING
         const planningTitle = document.createElement('div');
         planningTitle.className = 'section-title';
         planningTitle.id = `section-title-${folderIndex}-planning`;
@@ -250,7 +265,7 @@
         planningContent.appendChild(equipeGroup);
         planningContent.appendChild(contactGroup);
 
-        // *** RACCORDEMENT Section ***
+        // RACCORDEMENT
         const raccordementTitle = document.createElement('div');
         raccordementTitle.className = 'section-title';
         raccordementTitle.id = `section-title-${folderIndex}-raccordement`;
@@ -261,7 +276,6 @@
         raccordementContent.id = `section-content-${folderIndex}-raccordement`;
         raccordementContent.style.display = 'none';
 
-        // Type de raccordement (select)
         const typeRaccordGroup = document.createElement('div');
         typeRaccordGroup.className = 'form-group';
         typeRaccordGroup.innerHTML = '<label>Type de raccordement :</label>';
@@ -276,10 +290,9 @@
         typeRaccordSelect.value = folder.visiteTechnique?.typeRaccordement || '';
         typeRaccordSelect.onchange = (e) => saveData(folderIndex, 'typeRaccordement', e.target.value);
         typeRaccordGroup.appendChild(typeRaccordSelect);
-
         raccordementContent.appendChild(typeRaccordGroup);
 
-        // *** PUISSANCES Section ***
+        // PUISSANCES
         const puissancesTitle = document.createElement('div');
         puissancesTitle.className = 'section-title';
         puissancesTitle.id = `section-title-${folderIndex}-puissances`;
@@ -290,85 +303,69 @@
         puissancesContent.id = `section-content-${folderIndex}-puissances`;
         puissancesContent.style.display = 'none';
 
-        // Puissance de raccordement (commentaire)
+        // Puissance de raccordement
         const puissanceRaccordGroup = document.createElement('div');
         puissanceRaccordGroup.className = 'form-group';
         puissanceRaccordGroup.innerHTML = '<label>Puissance de raccordement :</label>';
-        const puissanceRaccordTextarea = document.createElement('textarea');
-        puissanceRaccordTextarea.rows = 2;
-        puissanceRaccordTextarea.value = folder.visiteTechnique?.puissanceRaccordement || '';
-        puissanceRaccordTextarea.oninput = (e) => saveData(folderIndex, 'puissanceRaccordement', e.target.value);
-        puissanceRaccordGroup.appendChild(puissanceRaccordTextarea);
+        const puissanceRaccordInput = document.createElement('input');
+        puissanceRaccordInput.type = 'text';
+        puissanceRaccordInput.value = folder.visiteTechnique?.puissanceRaccordement || '';
+        puissanceRaccordInput.oninput = (e) => saveData(folderIndex, 'puissanceRaccordement', e.target.value);
+        puissanceRaccordGroup.appendChild(puissanceRaccordInput);
 
-        // Puissance de projet PV (commentaire)
-        const puissanceProjetGroup = document.createElement('div');
-        puissanceProjetGroup.className = 'form-group';
-        puissanceProjetGroup.innerHTML = '<label>Puissance de projet PV :</label>';
-        const puissanceProjetTextarea = document.createElement('textarea');
-        puissanceProjetTextarea.rows = 2;
-        puissanceProjetTextarea.value = folder.visiteTechnique?.puissanceProjetPV || '';
-        puissanceProjetTextarea.oninput = (e) => saveData(folderIndex, 'puissanceProjetPV', e.target.value);
-        puissanceProjetGroup.appendChild(puissanceProjetTextarea);
+        // Puissance de projet PV
+        const puissancePVGroup = document.createElement('div');
+        puissancePVGroup.className = 'form-group';
+        puissancePVGroup.innerHTML = '<label>Puissance de projet PV :</label>';
+        const puissancePVInput = document.createElement('input');
+        puissancePVInput.type = 'text';
+        puissancePVInput.value = folder.visiteTechnique?.puissanceProjetPV || '';
+        puissancePVInput.oninput = (e) => saveData(folderIndex, 'puissanceProjetPV', e.target.value);
+        puissancePVGroup.appendChild(puissancePVInput);
 
         puissancesContent.appendChild(puissanceRaccordGroup);
-        puissancesContent.appendChild(puissanceProjetGroup);
+        puissancesContent.appendChild(puissancePVGroup);
 
-        // *** TRAVAUX ENEDIS Section ***
+        // TRAVAUX ENEDIS
         const travauxTitle = document.createElement('div');
         travauxTitle.className = 'section-title';
         travauxTitle.id = `section-title-${folderIndex}-travaux`;
-        travauxTitle.innerHTML = `<span>TRAVAUX ENEDIS :</span><span class="arrow">▼</span>`;
+        travauxTitle.innerHTML = `<span>TRAVAUX ENEDIS</span><span class="arrow">▼</span>`;
         travauxTitle.onclick = () => toggleSection(folderIndex, 'travaux');
 
         const travauxContent = document.createElement('div');
         travauxContent.id = `section-content-${folderIndex}-travaux`;
         travauxContent.style.display = 'none';
 
-        // PDL posé(s) lors de la VT (oui/non + commentaire)
-        const pdlPoseGroup = document.createElement('div');
-        pdlPoseGroup.className = 'form-group';
-        pdlPoseGroup.innerHTML = '<label>PDL posé(s) lors de la VT :</label>';
+        // PDL posé(s) lors de la VT (oui/non)
+        const pdlPosesGroup = document.createElement('div');
+        pdlPosesGroup.className = 'form-group';
+        pdlPosesGroup.innerHTML = '<label>PDL posé(s) lors de la VT :</label>';
         const pdlOuiLabel = document.createElement('label');
-        pdlOuiLabel.style.fontWeight = 'normal';
+        pdlOuiLabel.style.marginRight = '10px';
         const pdlOuiInput = document.createElement('input');
-        pdlOuiInput.type = 'checkbox';
-        pdlOuiInput.checked = folder.visiteTechnique?.pdlPoses?.oui || false;
-        pdlOuiInput.onchange = (e) => {
-          if (e.target.checked) {
-            // désélectionner l'autre
-            pdlNonInput.checked = false;
-            saveData(folderIndex, 'pdlPoses', { oui: true, non: false });
-          } else {
-            saveData(folderIndex, 'pdlPoses', { oui: false, non: pdlNonInput.checked });
-          }
-        };
+        pdlOuiInput.type = 'radio';
+        pdlOuiInput.name = `pdlPoses-${folderIndex}`;
+        pdlOuiInput.value = 'oui';
+        pdlOuiInput.checked = folder.visiteTechnique?.pdlPoses === 'oui';
+        pdlOuiInput.onchange = (e) => saveData(folderIndex, 'pdlPoses', e.target.value);
         pdlOuiLabel.appendChild(pdlOuiInput);
         pdlOuiLabel.appendChild(document.createTextNode(' Oui'));
 
         const pdlNonLabel = document.createElement('label');
-        pdlNonLabel.style.fontWeight = 'normal';
         const pdlNonInput = document.createElement('input');
-        pdlNonInput.type = 'checkbox';
-        pdlNonInput.checked = folder.visiteTechnique?.pdlPoses?.non || false;
-        pdlNonInput.onchange = (e) => {
-          if (e.target.checked) {
-            // désélectionner l'autre
-            pdlOuiInput.checked = false;
-            saveData(folderIndex, 'pdlPoses', { oui: false, non: true });
-          } else {
-            saveData(folderIndex, 'pdlPoses', { oui: pdlOuiInput.checked, non: false });
-          }
-        };
+        pdlNonInput.type = 'radio';
+        pdlNonInput.name = `pdlPoses-${folderIndex}`;
+        pdlNonInput.value = 'non';
+        pdlNonInput.checked = folder.visiteTechnique?.pdlPoses === 'non';
+        pdlNonInput.onchange = (e) => saveData(folderIndex, 'pdlPoses', e.target.value);
         pdlNonLabel.appendChild(pdlNonInput);
         pdlNonLabel.appendChild(document.createTextNode(' Non'));
 
-        const pdlCheckboxesDiv = document.createElement('div');
-        pdlCheckboxesDiv.style.display = 'flex';
-        pdlCheckboxesDiv.style.gap = '15px';
-        pdlCheckboxesDiv.appendChild(pdlOuiLabel);
-        pdlCheckboxesDiv.appendChild(pdlNonLabel);
+        pdlPosesGroup.appendChild(pdlOuiLabel);
+        pdlPosesGroup.appendChild(pdlNonLabel);
 
-        // Commentaire sur PDL posé
+        // Commentaire PDL posé
         const pdlCommentGroup = document.createElement('div');
         pdlCommentGroup.className = 'form-group';
         pdlCommentGroup.innerHTML = '<label>Commentaire :</label>';
@@ -384,16 +381,16 @@
         nombrePDLGroup.innerHTML = '<label>Nombre de PDL :</label>';
         const nombrePDLSelect = document.createElement('select');
         [0, 1, 2, 3].forEach(num => {
-          const opt = document.createElement('option');
-          opt.value = num;
-          opt.textContent = num;
-          nombrePDLSelect.appendChild(opt);
+          const option = document.createElement('option');
+          option.value = num;
+          option.textContent = num;
+          nombrePDLSelect.appendChild(option);
         });
         nombrePDLSelect.value = folder.visiteTechnique?.nombrePDL ?? 0;
         nombrePDLSelect.onchange = (e) => saveData(folderIndex, 'nombrePDL', e.target.value);
         nombrePDLGroup.appendChild(nombrePDLSelect);
 
-        travauxContent.appendChild(pdlCheckboxesDiv);
+        travauxContent.appendChild(pdlPosesGroup);
         travauxContent.appendChild(pdlCommentGroup);
         travauxContent.appendChild(nombrePDLGroup);
 
@@ -417,7 +414,6 @@
       });
     }
 
-    // Au chargement, si aucun dossier, on en crée un exemple
     if (folders.length === 0) {
       folders.push({ name: 'Dossier Exemple' });
       localStorage.setItem('folders', JSON.stringify(folders));
