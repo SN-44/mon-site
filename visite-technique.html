@@ -58,6 +58,22 @@
       display: none;
       padding: 15px;
     }
+    .section {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+    .section-header {
+      background-color: #f9f9f9;
+      padding: 8px;
+      font-weight: bold;
+      color: black;
+      cursor: pointer;
+    }
+    .section-content {
+      display: none;
+      padding: 10px;
+    }
     .form-group {
       margin-bottom: 10px;
     }
@@ -78,13 +94,6 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       resize: vertical;
-    }
-    .section-title {
-      font-weight: bold;
-      color: black;
-      margin-top: 20px;
-      margin-bottom: 10px;
-      font-size: 16px;
     }
     button {
       padding: 10px 15px;
@@ -122,6 +131,11 @@
       content.style.display = content.style.display === 'none' ? 'block' : 'none';
     }
 
+    function toggleSection(folderIndex, sectionIndex) {
+      const sectionContent = document.getElementById(`section-${folderIndex}-${sectionIndex}`);
+      sectionContent.style.display = sectionContent.style.display === 'none' ? 'block' : 'none';
+    }
+
     function saveData(index, field, value) {
       folders[index].visiteTechnique = folders[index].visiteTechnique || {};
       folders[index].visiteTechnique[field] = value;
@@ -143,9 +157,17 @@
         content.className = 'folder-content';
         content.id = 'content-' + index;
 
-        const planningTitle = document.createElement('div');
-        planningTitle.className = 'section-title';
-        planningTitle.textContent = 'PLANNING';
+        const section = document.createElement('div');
+        section.className = 'section';
+
+        const sectionHeader = document.createElement('div');
+        sectionHeader.className = 'section-header';
+        sectionHeader.textContent = 'PLANNING';
+        sectionHeader.onclick = () => toggleSection(index, 0);
+
+        const sectionContent = document.createElement('div');
+        sectionContent.className = 'section-content';
+        sectionContent.id = `section-${index}-0`;
 
         const interventionGroup = document.createElement('div');
         interventionGroup.className = 'form-group';
@@ -174,10 +196,13 @@
         contactTextarea.oninput = (e) => saveData(index, 'contact', e.target.value);
         contactGroup.appendChild(contactTextarea);
 
-        content.appendChild(planningTitle);
-        content.appendChild(interventionGroup);
-        content.appendChild(equipeGroup);
-        content.appendChild(contactGroup);
+        sectionContent.appendChild(interventionGroup);
+        sectionContent.appendChild(equipeGroup);
+        sectionContent.appendChild(contactGroup);
+
+        section.appendChild(sectionHeader);
+        section.appendChild(sectionContent);
+        content.appendChild(section);
 
         div.appendChild(header);
         div.appendChild(content);
