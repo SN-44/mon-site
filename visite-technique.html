@@ -188,11 +188,33 @@
         `;
         content.appendChild(planning.section);
 
+        const categorie = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`);
+        categorie.sectionContent.innerHTML = `
+          <div class="form-group">
+            <label>Type de bâtiment :</label>
+            <select onchange="saveData(${index}, 'typeBatiment', this.value)">
+              <option value="">-- Sélectionner --</option>
+              <option value="Agricole">Agricole</option>
+              <option value="Industriel">Industriel</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Classé :</label>
+            <select onchange="saveData(${index}, 'classeBatiment', this.value)">
+              <option value="">-- Sélectionner --</option>
+              <option value="ICPE">ICPE</option>
+              <option value="ERP">ERP</option>
+              <option value="ERT">ERT</option>
+            </select>
+          </div>
+        `;
+        content.appendChild(categorie.section);
+
         const printButton = document.createElement('button');
         printButton.textContent = 'Imprimer ce dossier';
         printButton.onclick = () => {
           const element = document.createElement('div');
-          element.innerHTML = `<h2>${folder.name}</h2>` + content.innerHTML;
+          element.innerHTML = `<h2>${folder.name}</h2>` + content.innerHTML.replace(/style="display: none;"/g, '');
           const opt = {
             margin:       0.5,
             filename:     `${folder.name}.pdf`,
