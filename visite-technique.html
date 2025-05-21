@@ -82,12 +82,18 @@
     .section-title {
       font-weight: bold;
       color: black;
-      margin-top: 20px;
-      margin-bottom: 10px;
-      font-size: 16px;
-      background-color: #eee;
-      padding: 6px;
+      background-color: #e0e0e0;
+      padding: 10px;
       border-radius: 4px;
+      margin-top: 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .section-content {
+      display: none;
+      padding-top: 10px;
     }
     button {
       padding: 10px 15px;
@@ -125,80 +131,15 @@
       content.style.display = content.style.display === 'none' ? 'block' : 'none';
     }
 
+    function toggleSection(id) {
+      const section = document.getElementById(id);
+      section.style.display = section.style.display === 'none' ? 'block' : 'none';
+    }
+
     function saveData(index, field, value) {
       folders[index].visiteTechnique = folders[index].visiteTechnique || {};
       folders[index].visiteTechnique[field] = value;
       localStorage.setItem('folders', JSON.stringify(folders));
-    }
-
-    function printFolder(index) {
-      const folderDiv = document.querySelectorAll('.folder')[index];
-      if (!folderDiv) {
-        alert('Erreur : impossible de trouver le dossier à imprimer.');
-        return;
-      }
-
-      const printWindow = window.open('', '', 'width=800,height=600');
-      if (!printWindow) {
-        alert('Impossible d’ouvrir la fenêtre d’impression. Vérifiez que les popups ne sont pas bloqués.');
-        return;
-      }
-
-      const style = `
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            font-size: 12pt;
-            margin: 20px;
-          }
-          .folder-header {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-          }
-          .section-title {
-            background-color: #eeeeee;
-            padding: 6px;
-            margin-top: 15px;
-            font-weight: bold;
-          }
-          .form-group {
-            margin-bottom: 10px;
-          }
-          label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 3px;
-          }
-          textarea, input, select {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 5px;
-            font-size: 12pt;
-          }
-        </style>
-      `;
-
-      const contentToPrint = `
-        <html>
-          <head>
-            <title>Impression du dossier</title>
-            ${style}
-          </head>
-          <body>
-            ${folderDiv.innerHTML}
-          </body>
-        </html>
-      `;
-
-      printWindow.document.write(contentToPrint);
-      printWindow.document.close();
-
-      printWindow.onload = function () {
-        printWindow.focus();
-        printWindow.print();
-        printWindow.close();
-      };
     }
 
     function render() {
@@ -216,45 +157,131 @@
         content.className = 'folder-content';
         content.id = 'content-' + index;
 
-        const planningTitle = document.createElement('div');
-        planningTitle.className = 'section-title';
-        planningTitle.textContent = 'PLANNING';
+        function createSection(title, sectionId) {
+          const section = document.createElement('div');
 
-        const interventionGroup = document.createElement('div');
-        interventionGroup.className = 'form-group';
-        interventionGroup.innerHTML = '<label>Intervention en :</label>';
-        const interventionInput = document.createElement('input');
-        interventionInput.type = 'date';
-        interventionInput.value = folder.visiteTechnique?.intervention || '';
-        interventionInput.onchange = (e) => saveData(index, 'intervention', e.target.value);
-        interventionGroup.appendChild(interventionInput);
+          const sectionTitle = document.createElement('div');
+          sectionTitle.className = 'section-title';
+          sectionTitle.innerHTML = `${title} <span>▼</span>`;
+          sectionTitle.onclick = () => toggleSection(sectionId);
 
-        const equipeGroup = document.createElement('div');
-        equipeGroup.className = 'form-group';
-        equipeGroup.innerHTML = '<label>Équipe :</label>';
-        const equipeTextarea = document.createElement('textarea');
-        equipeTextarea.rows = 2;
-        equipeTextarea.value = folder.visiteTechnique?.equipe || '';
-        equipeTextarea.oninput = (e) => saveData(index, 'equipe', e.target.value);
-        equipeGroup.appendChild(equipeTextarea);
+          const sectionContent = document.createElement('div');
+          sectionContent.className = 'section-content';
+          sectionContent.id = sectionId;
 
-        const contactGroup = document.createElement('div');
-        contactGroup.className = 'form-group';
-        contactGroup.innerHTML = '<label>Contact chef d\'équipe :</label>';
-        const contactTextarea = document.createElement('textarea');
-        contactTextarea.rows = 2;
-        contactTextarea.value = folder.visiteTechnique?.contact || '';
-        contactTextarea.oninput = (e) => saveData(index, 'contact', e.target.value);
-        contactGroup.appendChild(contactTextarea);
+          section.appendChild(sectionTitle);
+          section.appendChild(sectionContent);
 
+          return { section, sectionContent };
+        }
+
+        // PLANNING
+        const planning = createSection('PLANNING', `planning-${index}`);
+        planning.sectionContent.innerHTML = `
+          <div class="form-group">
+            <label>Intervention en :</label>
+            <input type="date" value="${folder.visiteTechnique?.intervention || ''}" onchange="saveData(${index}, 'intervention', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Équipe :</label>
+            <textarea rows="2" oninput="saveData(${index}, 'equipe', this.value)">${folder.visiteTechnique?.equipe || ''}</textarea>
+          </div>
+          <div class="form-group">
+            <label>Contact chef d'équipe :</label>
+            <textarea rows="2" oninput="saveData(${index}, 'contact', this.value)">${folder.visiteTechnique?.contact || ''}</textarea>
+          </div>
+        `;
+        content.appendChild(planning.section);
+
+        // RACCORDEMENT
+        const raccordement = createSection('RACCORDEMENT', `raccordement-${index}`);
+        raccordement.sectionContent.innerHTML = `
+          <div class="form-group">
+            <label>Type de raccordement :</label>
+            <select onchange="saveData(${index}, 'raccordement', this.value)">
+              <option value="">-- Sélectionner --</option>
+              <option value="Vente total">Vente total</option>
+              <option value="Autoconsommation">Autoconsommation</option>
+              <option value="Vente de surplus">Vente de surplus</option>
+            </select>
+          </div>
+        `;
+        content.appendChild(raccordement.section);
+
+        // PUISSANCES
+        const puissances = createSection('PUISSANCES', `puissances-${index}`);
+        puissances.sectionContent.innerHTML = `
+          <div class="form-group">
+            <label>Puissance de raccordement :</label>
+            <textarea rows="1" oninput="saveData(${index}, 'puissance_raccordement', this.value)">${folder.visiteTechnique?.puissance_raccordement || ''}</textarea>
+          </div>
+          <div class="form-group">
+            <label>Puissance de projet PV :</label>
+            <textarea rows="1" oninput="saveData(${index}, 'puissance_pv', this.value)">${folder.visiteTechnique?.puissance_pv || ''}</textarea>
+          </div>
+        `;
+        content.appendChild(puissances.section);
+
+        // TRAVAUX ENEDIS
+        const enedis = createSection('TRAVAUX ENEDIS', `enedis-${index}`);
+        enedis.sectionContent.innerHTML = `
+          <div class="form-group">
+            <label>PDL posé(s) lors de la VT :</label>
+            <label><input type="radio" name="pdl-${index}" value="oui" onchange="saveData(${index}, 'pdl_pose', this.value)"> Oui</label>
+            <label><input type="radio" name="pdl-${index}" value="non" onchange="saveData(${index}, 'pdl_pose', this.value)"> Non</label>
+            <textarea rows="1" oninput="saveData(${index}, 'comment_pdl', this.value)">${folder.visiteTechnique?.comment_pdl || ''}</textarea>
+          </div>
+          <div class="form-group">
+            <label>Nombre de PDL :</label>
+            <select onchange="saveData(${index}, 'nb_pdl', this.value)">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+        `;
+        content.appendChild(enedis.section);
+
+        // CATEGORIE DU BATIMENT
+        const categorie = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`);
+        categorie.sectionContent.innerHTML = `
+          <div class="form-group">
+            <label>Type de bâtiment :</label>
+            <select onchange="saveData(${index}, 'type_batiment', this.value)">
+              <option value="">-- Sélectionner --</option>
+              <option value="Agricole">Agricole</option>
+              <option value="Industriel">Industriel</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Classé :</label>
+            <select onchange="saveData(${index}, 'classe', this.value)">
+              <option value="">-- Sélectionner --</option>
+              <option value="ICPE">ICPE</option>
+              <option value="ERP">ERP</option>
+              <option value="ERT">ERT</option>
+            </select>
+          </div>
+        `;
+        content.appendChild(categorie.section);
+
+        // Impression
         const printButton = document.createElement('button');
         printButton.textContent = 'Imprimer ce dossier';
-        printButton.onclick = () => printFolder(index);
+        printButton.onclick = () => {
+          const printContent = content.cloneNode(true);
+          const newWin = window.open('', '', 'width=900,height=700');
+          newWin.document.write('<html><head><title>Impression</title><style>body{font-family:Arial;} label{font-weight:bold;} .section-title{background:#eee;padding:5px;}</style></head><body>');
+          newWin.document.write('<h2>' + folder.name + '</h2>');
+          newWin.document.body.appendChild(printContent);
+          newWin.document.write('</body></html>');
+          newWin.document.close();
+          newWin.focus();
+          newWin.print();
+          newWin.close();
+        };
 
-        content.appendChild(planningTitle);
-        content.appendChild(interventionGroup);
-        content.appendChild(equipeGroup);
-        content.appendChild(contactGroup);
         content.appendChild(printButton);
 
         div.appendChild(header);
