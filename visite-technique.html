@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visite Technique</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -66,17 +67,13 @@
       margin-bottom: 4px;
       font-weight: bold;
     }
-    input[type="text"], input[type="date"], select {
+    input[type="text"], input[type="date"], select, textarea {
       width: 100%;
       padding: 8px;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
     textarea {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
       resize: vertical;
     }
     .section-title {
@@ -159,7 +156,6 @@
 
         function createSection(title, sectionId) {
           const section = document.createElement('div');
-
           const sectionTitle = document.createElement('div');
           sectionTitle.className = 'section-title';
           sectionTitle.innerHTML = `${title} <span>▼</span>`;
@@ -175,7 +171,6 @@
           return { section, sectionContent };
         }
 
-        // PLANNING
         const planning = createSection('PLANNING', `planning-${index}`);
         planning.sectionContent.innerHTML = `
           <div class="form-group">
@@ -193,97 +188,22 @@
         `;
         content.appendChild(planning.section);
 
-        // RACCORDEMENT
-        const raccordement = createSection('RACCORDEMENT', `raccordement-${index}`);
-        raccordement.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>Type de raccordement :</label>
-            <select onchange="saveData(${index}, 'raccordement', this.value)">
-              <option value="">-- Sélectionner --</option>
-              <option value="Vente total">Vente total</option>
-              <option value="Autoconsommation">Autoconsommation</option>
-              <option value="Vente de surplus">Vente de surplus</option>
-            </select>
-          </div>
-        `;
-        content.appendChild(raccordement.section);
-
-        // PUISSANCES
-        const puissances = createSection('PUISSANCES', `puissances-${index}`);
-        puissances.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>Puissance de raccordement :</label>
-            <textarea rows="1" oninput="saveData(${index}, 'puissance_raccordement', this.value)">${folder.visiteTechnique?.puissance_raccordement || ''}</textarea>
-          </div>
-          <div class="form-group">
-            <label>Puissance de projet PV :</label>
-            <textarea rows="1" oninput="saveData(${index}, 'puissance_pv', this.value)">${folder.visiteTechnique?.puissance_pv || ''}</textarea>
-          </div>
-        `;
-        content.appendChild(puissances.section);
-
-        // TRAVAUX ENEDIS
-        const enedis = createSection('TRAVAUX ENEDIS', `enedis-${index}`);
-        enedis.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>PDL posé(s) lors de la VT :</label>
-            <label><input type="radio" name="pdl-${index}" value="oui" onchange="saveData(${index}, 'pdl_pose', this.value)"> Oui</label>
-            <label><input type="radio" name="pdl-${index}" value="non" onchange="saveData(${index}, 'pdl_pose', this.value)"> Non</label>
-            <textarea rows="1" oninput="saveData(${index}, 'comment_pdl', this.value)">${folder.visiteTechnique?.comment_pdl || ''}</textarea>
-          </div>
-          <div class="form-group">
-            <label>Nombre de PDL :</label>
-            <select onchange="saveData(${index}, 'nb_pdl', this.value)">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-            </select>
-          </div>
-        `;
-        content.appendChild(enedis.section);
-
-        // CATEGORIE DU BATIMENT
-        const categorie = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`);
-        categorie.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>Type de bâtiment :</label>
-            <select onchange="saveData(${index}, 'type_batiment', this.value)">
-              <option value="">-- Sélectionner --</option>
-              <option value="Agricole">Agricole</option>
-              <option value="Industriel">Industriel</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Classé :</label>
-            <select onchange="saveData(${index}, 'classe', this.value)">
-              <option value="">-- Sélectionner --</option>
-              <option value="ICPE">ICPE</option>
-              <option value="ERP">ERP</option>
-              <option value="ERT">ERT</option>
-            </select>
-          </div>
-        `;
-        content.appendChild(categorie.section);
-
-        // Impression
         const printButton = document.createElement('button');
         printButton.textContent = 'Imprimer ce dossier';
         printButton.onclick = () => {
-          const printContent = content.cloneNode(true);
-          const newWin = window.open('', '', 'width=900,height=700');
-          newWin.document.write('<html><head><title>Impression</title><style>body{font-family:Arial;} label{font-weight:bold;} .section-title{background:#eee;padding:5px;}</style></head><body>');
-          newWin.document.write('<h2>' + folder.name + '</h2>');
-          newWin.document.body.appendChild(printContent);
-          newWin.document.write('</body></html>');
-          newWin.document.close();
-          newWin.focus();
-          newWin.print();
-          newWin.close();
+          const element = document.createElement('div');
+          element.innerHTML = `<h2>${folder.name}</h2>` + content.innerHTML;
+          const opt = {
+            margin:       0.5,
+            filename:     `${folder.name}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+          };
+          html2pdf().from(element).set(opt).save();
         };
 
         content.appendChild(printButton);
-
         div.appendChild(header);
         div.appendChild(content);
         container.appendChild(div);
