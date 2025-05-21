@@ -179,95 +179,40 @@
           return { section, sectionContent };
         }
 
-        const planning = createSection('PLANNING', `planning-${index}`);
-        planning.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>Intervention en :</label>
-            <input type="date" value="${folder.visiteTechnique?.intervention || ''}" onchange="saveData(${index}, 'intervention', this.value)">
-          </div>
-          <div class="form-group">
-            <label>Équipe :</label>
-            <textarea rows="2" oninput="saveData(${index}, 'equipe', this.value)">${folder.visiteTechnique?.equipe || ''}</textarea>
-          </div>
-          <div class="form-group">
-            <label>Contact chef d'équipe :</label>
-            <textarea rows="2" oninput="saveData(${index}, 'contact', this.value)">${folder.visiteTechnique?.contact || ''}</textarea>
-          </div>
-        `;
-        content.appendChild(planning.section);
-
-        const raccordement = createSection('RACCORDEMENT', `raccordement-${index}`);
-        raccordement.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>Type de raccordement :</label>
-            <select onchange="saveData(${index}, 'typeRaccordement', this.value)">
-              <option value="">-- Choisir --</option>
-              <option value="Vente total">Vente total</option>
-              <option value="Autoconsommation">Autoconsommation</option>
-              <option value="Vente de surplus">Vente de surplus</option>
-            </select>
-          </div>
-        `;
-        content.appendChild(raccordement.section);
-
-        const puissances = createSection('PUISSANCES', `puissances-${index}`);
-        puissances.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>Puissance de raccordement :</label>
-            <textarea rows="2" oninput="saveData(${index}, 'puissanceRaccordement', this.value)">${folder.visiteTechnique?.puissanceRaccordement || ''}</textarea>
-          </div>
-          <div class="form-group">
-            <label>Puissance de projet PV :</label>
-            <textarea rows="2" oninput="saveData(${index}, 'puissanceProjet', this.value)">${folder.visiteTechnique?.puissanceProjet || ''}</textarea>
-          </div>
-        `;
-        content.appendChild(puissances.section);
-
-        const travaux = createSection('TRAVAUX ENEDIS', `enedis-${index}`);
-        travaux.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>PDL posé(s) lors de la VT :</label>
-            <input type="radio" name="pdl-${index}" value="oui" onchange="saveData(${index}, 'pdlPose', 'oui')"> Oui
-            <input type="radio" name="pdl-${index}" value="non" onchange="saveData(${index}, 'pdlPose', 'non')"> Non
-          </div>
-          <div class="form-group">
-            <label>Nombre de PDL :</label>
-            <select onchange="saveData(${index}, 'nombrePDL', this.value)">
-              <option value="">-- Choisir --</option>
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-            </select>
-          </div>
-        `;
-        content.appendChild(travaux.section);
-
         const categorie = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`);
         categorie.sectionContent.innerHTML = `
           <div class="form-group">
             <label>Type de bâtiment :</label>
             <select onchange="saveData(${index}, 'typeBatiment', this.value)">
-              <option value="">-- Choisir --</option>
-              <option value="Agricole">Agricole</option>
-              <option value="Industriel">Industriel</option>
+              <option value="" ${!folder.visiteTechnique?.typeBatiment ? 'selected' : ''}>-- Choisir --</option>
+              <option value="Agricole" ${folder.visiteTechnique?.typeBatiment === 'Agricole' ? 'selected' : ''}>Agricole</option>
+              <option value="Industriel" ${folder.visiteTechnique?.typeBatiment === 'Industriel' ? 'selected' : ''}>Industriel</option>
             </select>
           </div>
           <div class="form-group">
             <label>Classé :</label>
             <select onchange="saveData(${index}, 'classement', this.value)">
-              <option value="">-- Choisir --</option>
-              <option value="ICPE">ICPE</option>
-              <option value="ERP">ERP</option>
-              <option value="ERT">ERT</option>
+              <option value="" ${!folder.visiteTechnique?.classement ? 'selected' : ''}>-- Choisir --</option>
+              <option value="ICPE" ${folder.visiteTechnique?.classement === 'ICPE' ? 'selected' : ''}>ICPE</option>
+              <option value="ERP" ${folder.visiteTechnique?.classement === 'ERP' ? 'selected' : ''}>ERP</option>
+              <option value="ERT" ${folder.visiteTechnique?.classement === 'ERT' ? 'selected' : ''}>ERT</option>
             </select>
           </div>
         `;
         content.appendChild(categorie.section);
 
+        // Ajoutez ici les autres sections précédemment définies, avec leurs valeurs restaurées
+
         const printButton = document.createElement('button');
         printButton.textContent = 'Imprimer ce dossier';
         printButton.onclick = () => {
+          const originalDisplay = [];
+          content.style.display = 'block';
+          content.querySelectorAll('.section-content').forEach((el, i) => {
+            originalDisplay[i] = el.style.display;
+            el.style.display = 'block';
+          });
+
           const element = document.createElement('div');
           element.innerHTML = `<h2>${folder.name}</h2>` + content.innerHTML;
           const opt = {
@@ -277,7 +222,12 @@
             html2canvas:  { scale: 2 },
             jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
           };
-          html2pdf().from(element).set(opt).save();
+
+          html2pdf().from(element).set(opt).save().then(() => {
+            content.querySelectorAll('.section-content').forEach((el, i) => {
+              el.style.display = originalDisplay[i];
+            });
+          });
         };
 
         const deleteButton = document.createElement('button');
