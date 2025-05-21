@@ -10,12 +10,15 @@
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
       margin: 0; padding: 0;
+      padding-bottom: 60px; /* espace pour bouton en bas */
     }
     header {
       background-color: #007acc;
       padding: 15px;
       color: white;
       text-align: center;
+      font-size: 1.5em;
+      user-select: none;
     }
     nav {
       display: flex;
@@ -28,6 +31,7 @@
       text-decoration: none;
       text-align: center;
       transition: background-color 0.3s;
+      font-size: 1em;
     }
     nav a:hover, nav a.active {
       background-color: #004c82;
@@ -36,7 +40,7 @@
     main {
       max-width: 900px;
       margin: 20px auto;
-      padding: 20px;
+      padding: 10px 20px;
       background-color: white;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -45,10 +49,11 @@
       border: 1px solid #ccc;
       border-radius: 6px;
       margin-bottom: 15px;
+      overflow: hidden;
     }
     .folder-header {
       background-color: #f1f1f1;
-      padding: 10px;
+      padding: 12px 15px;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
@@ -57,16 +62,18 @@
       font-weight: bold;
       font-size: 1.1em;
     }
-    .folder-header span {
+    .folder-header span.arrow {
       transition: transform 0.3s ease;
       display: inline-block;
+      margin-left: 8px;
     }
-    .folder-header.open span {
+    .folder-header.open span.arrow {
       transform: rotate(180deg);
     }
     .folder-content {
       display: none;
       padding: 15px;
+      border-top: 1px solid #ccc;
     }
     .section-title {
       font-weight: bold;
@@ -80,17 +87,20 @@
       justify-content: space-between;
       align-items: center;
       user-select: none;
+      font-size: 1em;
     }
-    .section-title span {
+    .section-title span.arrow {
       transition: transform 0.3s ease;
       display: inline-block;
+      margin-left: 8px;
     }
-    .section-title.open span {
+    .section-title.open span.arrow {
       transform: rotate(180deg);
     }
     .section-content {
       display: none;
       padding-top: 10px;
+      font-size: 0.95em;
     }
     .form-group {
       margin-bottom: 10px;
@@ -112,27 +122,62 @@
     textarea {
       min-height: 40px;
     }
-    button {
-      padding: 10px 15px;
+
+    /* Bouton d'impression fixe en bas */
+    #print-btn {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
       background-color: #007acc;
       border: none;
       color: white;
       font-weight: bold;
-      border-radius: 4px;
+      font-size: 1.2em;
+      padding: 12px 25px;
+      border-radius: 30px;
       cursor: pointer;
-      margin-top: 15px;
-      display: block;
-      width: 100%;
-      max-width: 300px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      z-index: 1000;
+      user-select: none;
+      width: 90%;
+      max-width: 400px;
     }
-    button:hover {
-      background-color: #005fa3;
+    #print-btn:active {
+      background-color: #005a99;
+    }
+
+    /* Responsive : texte plus gros et padding pour smartphone */
+    @media (max-width: 600px) {
+      header {
+        font-size: 1.3em;
+      }
+      nav a {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      main {
+        margin: 10px 10px 80px 10px;
+        padding: 10px 15px;
+      }
+      .folder-header {
+        font-size: 1em;
+        padding: 10px 12px;
+      }
+      .section-title {
+        font-size: 0.95em;
+        padding: 8px 10px;
+      }
+      #print-btn {
+        font-size: 1.1em;
+        padding: 10px 20px;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Visite Technique</h1>
+    Visite Technique
   </header>
   <nav>
     <a href="index.html">Accueil</a>
@@ -141,6 +186,8 @@
     <a href="mise-en-service.html">Mise en service</a>
   </nav>
   <main id="folders-container"></main>
+
+  <button id="print-btn" aria-label="Imprimer le rapport PDF">Imprimer PDF</button>
 
   <script>
     const container = document.getElementById('folders-container');
@@ -192,10 +239,10 @@
         const div = document.createElement('div');
         div.className = 'folder';
 
-        // Folder header with toggler arrow
+        // Folder header with toggler arrow (arrow separate from text)
         const header = document.createElement('div');
         header.className = 'folder-header';
-        header.innerHTML = `<span>${folder.name}</span><span>▼</span>`;
+        header.innerHTML = `<span class="folder-name">${folder.name}</span><span class="arrow">▼</span>`;
         header.onclick = () => toggleFolderContent(index, header);
 
         // Folder content container
@@ -203,13 +250,12 @@
         content.className = 'folder-content';
         content.id = 'content-' + index;
 
-        // Helper to create a collapsible section with title & content div
         function createSection(title, sectionId) {
           const section = document.createElement('div');
 
           const sectionTitle = document.createElement('div');
           sectionTitle.className = 'section-title';
-          sectionTitle.innerHTML = `${title} <span>▼</span>`;
+          sectionTitle.innerHTML = `${title} <span class="arrow">▼</span>`;
           sectionTitle.onclick = () => toggleSection(sectionId, sectionTitle);
 
           const sectionContent = document.createElement('div');
@@ -222,7 +268,7 @@
           return { section, sectionContent };
         }
 
-        // --- Section PLANNING ---
+        // PLANNING
         const planning = createSection('PLANNING', `planning-${index}`);
         planning.sectionContent.innerHTML = `
           <div class="form-group">
@@ -240,7 +286,7 @@
         `;
         content.appendChild(planning.section);
 
-        // --- Section RACCORDEMENT ---
+        // RACCORDEMENT
         const raccordement = createSection('RACCORDEMENT', `raccordement-${index}`);
         const raccordementValue = folder.visiteTechnique?.raccordement || '';
         raccordement.sectionContent.innerHTML = `
@@ -256,7 +302,7 @@
         `;
         content.appendChild(raccordement.section);
 
-        // --- Section PUISSANCES ---
+        // PUISSANCES
         const puissances = createSection('PUISSANCES', `puissances-${index}`);
         const puissancesData = folder.visiteTechnique?.puissances || {};
         puissances.sectionContent.innerHTML = `
@@ -271,7 +317,7 @@
         `;
         content.appendChild(puissances.section);
 
-        // --- Section TRAVAUX ENEDIS ---
+        // TRAVAUX ENEDIS
         const travaux = createSection('TRAVAUX ENEDIS', `travaux-${index}`);
         const travauxData = folder.visiteTechnique?.travaux || {};
         travaux.sectionContent.innerHTML = `
@@ -294,7 +340,7 @@
         `;
         content.appendChild(travaux.section);
 
-        // --- Section CATEGORIE DU BATIMENT ---
+        // CATEGORIE DU BATIMENT
         const categorie = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`);
         const categorieData = folder.visiteTechnique?.categorie || {};
         categorie.sectionContent.innerHTML = `
@@ -302,17 +348,10 @@
             <label>Type de bâtiment :</label>
             <select onchange="saveDataNested(${index}, 'categorie', 'typeBatiment', this.value)">
               <option value="">-- Sélectionner --</option>
-              <option value="Agricole" ${categorieData.typeBatiment === 'Agricole' ? 'selected' : ''}>Agricole</option>
               <option value="Industriel" ${categorieData.typeBatiment === 'Industriel' ? 'selected' : ''}>Industriel</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Classé :</label>
-            <select onchange="saveDataNested(${index}, 'categorie', 'classe', this.value)">
-              <option value="">-- Sélectionner --</option>
-              <option value="ICPE" ${categorieData.classe === 'ICPE' ? 'selected' : ''}>ICPE</option>
-              <option value="ERP" ${categorieData.classe === 'ERP' ? 'selected' : ''}>ERP</option>
-              <option value="ERT" ${categorieData.classe === 'ERT' ? 'selected' : ''}>ERT</option>
+              <option value="Commercial" ${categorieData.typeBatiment === 'Commercial' ? 'selected' : ''}>Commercial</option>
+              <option value="Résidentiel" ${categorieData.typeBatiment === 'Résidentiel' ? 'selected' : ''}>Résidentiel</option>
+              <option value="Autre" ${categorieData.typeBatiment === 'Autre' ? 'selected' : ''}>Autre</option>
             </select>
           </div>
           <div class="form-group">
@@ -324,23 +363,44 @@
 
         div.appendChild(header);
         div.appendChild(content);
-
         container.appendChild(div);
       });
     }
 
-    // Pour test initial, si pas de dossiers, on en crée un par défaut
-    if(folders.length === 0){
+    // Init par défaut si pas de dossiers
+    if (folders.length === 0) {
       folders = [
-        {name: 'Dossier A', visiteTechnique: {}},
-        {name: 'Dossier B', visiteTechnique: {}},
+        { name: 'Dossier A', visiteTechnique: {} },
+        { name: 'Dossier B', visiteTechnique: {} },
       ];
       localStorage.setItem('folders', JSON.stringify(folders));
     }
 
     render();
 
-    // Gestion globale pour que les fonctions inline appellent celles du scope global
+    // Fonction impression PDF via html2pdf
+    document.getElementById('print-btn').addEventListener('click', () => {
+      // On clone le container pour retirer éléments inutiles pour impression
+      const printContent = container.cloneNode(true);
+
+      // On affiche tous les dossiers et sections dépliés pour impression
+      printContent.querySelectorAll('.folder-content').forEach(div => div.style.display = 'block');
+      printContent.querySelectorAll('.section-content').forEach(div => div.style.display = 'block');
+      printContent.querySelectorAll('.folder-header').forEach(hdr => hdr.classList.add('open'));
+      printContent.querySelectorAll('.section-title').forEach(title => title.classList.add('open'));
+
+      const opt = {
+        margin: 0.5,
+        filename: 'rapport-visite-technique.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+      };
+
+      html2pdf().set(opt).from(printContent).save();
+    });
+
+    // Expose fonctions globalement pour inline events
     window.saveData = saveData;
     window.saveDataNested = saveDataNested;
   </script>
