@@ -201,7 +201,23 @@
         `;
         content.appendChild(categorie.section);
 
-        // Ajoutez ici les autres sections précédemment définies, avec leurs valeurs restaurées
+        const dateVisite = createSection('DATE DE VISITE TECHNIQUE', `dateVisite-${index}`);
+        dateVisite.sectionContent.innerHTML = `
+          <div class="form-group">
+            <label>Date de la visite :</label>
+            <input type="date" value="${folder.visiteTechnique?.dateVisite || ''}" onchange="saveData(${index}, 'dateVisite', this.value)">
+          </div>
+        `;
+        content.appendChild(dateVisite.section);
+
+        const sortieAC = createSection('SORTIE CÂBLE AC', `sortieAC-${index}`);
+        sortieAC.sectionContent.innerHTML = `
+          <div class="form-group">
+            <label><input type="checkbox" onchange="saveData(${index}, 'sortieACDroite', this.checked)" ${folder.visiteTechnique?.sortieACDroite ? 'checked' : ''}> Droite</label>
+            <label><input type="checkbox" onchange="saveData(${index}, 'sortieACGauche', this.checked)" ${folder.visiteTechnique?.sortieACGauche ? 'checked' : ''}> Gauche</label>
+          </div>
+        `;
+        content.appendChild(sortieAC.section);
 
         const printButton = document.createElement('button');
         printButton.textContent = 'Imprimer ce dossier';
