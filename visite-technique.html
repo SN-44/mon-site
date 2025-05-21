@@ -340,25 +340,22 @@
         `;
         content.appendChild(travaux.section);
 
-        // CATEGORIE DU BATIMENT
-        const categorie = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`);
-        const categorieData = folder.visiteTechnique?.categorie || {};
-        categorie.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>Type de bâtiment :</label>
-            <select onchange="saveDataNested(${index}, 'categorie', 'typeBatiment', this.value)">
-              <option value="">-- Sélectionner --</option>
-              <option value="Industriel" ${categorieData.typeBatiment === 'Industriel' ? 'selected' : ''}>Industriel</option>
-              <option value="Commercial" ${categorieData.typeBatiment === 'Commercial' ? 'selected' : ''}>Commercial</option>
-              <option value="Résidentiel" ${categorieData.typeBatiment === 'Résidentiel' ? 'selected' : ''}>Résidentiel</option>
-              <option value="Autre" ${categorieData.typeBatiment === 'Autre' ? 'selected' : ''}>Autre</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Année de construction :</label>
-            <input type="text" value="${categorieData.anneeConstruction || ''}" onchange="saveDataNested(${index}, 'categorie', 'anneeConstruction', this.value)">
-          </div>
-        `;
+       // CATEGORIE DU BATIMENT
+const categorie = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`);
+const categorieData = folder.visiteTechnique?.categorie || {};
+categorie.sectionContent.innerHTML = `
+  <div class="form-group">
+    <label>Type de bâtiment :</label>
+    <input type="text" value="${categorieData.typeBatiment || ''}" onchange="saveDataNested(${index}, 'categorie', 'typeBatiment', this.value)">
+  </div>
+  <div class="form-group">
+    <label>
+      <input type="checkbox" ${categorieData.classe ? 'checked' : ''} onchange="saveDataNested(${index}, 'categorie', 'classe', this.checked)">
+      Classé
+    </label>
+  </div>
+`;
+
         content.appendChild(categorie.section);
 
         div.appendChild(header);
