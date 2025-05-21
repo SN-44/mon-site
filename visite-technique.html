@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Visite Technique</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
     }
     header {
       background-color: #007acc;
@@ -40,7 +39,7 @@
       padding: 20px;
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .folder {
       border: 1px solid #ccc;
@@ -54,27 +53,19 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      user-select: none;
+      font-weight: bold;
+    }
+    .folder-header span {
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+    .folder-header.open span {
+      transform: rotate(180deg);
     }
     .folder-content {
       display: none;
       padding: 15px;
-    }
-    .form-group {
-      margin-bottom: 10px;
-    }
-    label {
-      display: block;
-      margin-bottom: 4px;
-      font-weight: bold;
-    }
-    input[type="text"], input[type="date"], select, textarea {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    textarea {
-      resize: vertical;
     }
     .section-title {
       font-weight: bold;
@@ -87,10 +78,48 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      user-select: none;
+    }
+    .section-title span {
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+    .section-title.open span {
+      transform: rotate(180deg);
     }
     .section-content {
       display: none;
       padding-top: 10px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: normal;
+    }
+    input[type="text"], input[type="date"], select, textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+    textarea {
+      resize: vertical;
+    }
+    .checkbox-group label {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 15px;
+      cursor: pointer;
+    }
+    .checkbox-group input[type="checkbox"] {
+      margin-left: 8px;
+      cursor: pointer;
     }
     button {
       padding: 10px 15px;
@@ -100,166 +129,340 @@
       font-weight: bold;
       border-radius: 4px;
       cursor: pointer;
-      margin: 5px 5px 0 0;
+      margin: 10px 10px 0 0;
+      user-select: none;
     }
     button:hover {
       background-color: #005fa3;
     }
+    button.delete {
+      background-color: #cc0000;
+    }
+    button.delete:hover {
+      background-color: #990000;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Visite Technique</h1>
-  </header>
-  <nav>
-    <a href="index.html">Accueil</a>
-    <a href="visite-technique.html" class="active">Visite technique</a>
-    <a href="suivi-chantier.html">Suivi de chantier</a>
-    <a href="mise-en-service.html">Mise en service</a>
-  </nav>
-  <main id="folders-container"></main>
+<header>
+  <h1>Visite Technique</h1>
+</header>
+<nav>
+  <a href="index.html">Accueil</a>
+  <a href="visite-technique.html" class="active">Visite technique</a>
+  <a href="suivi-chantier.html">Suivi de chantier</a>
+  <a href="mise-en-service.html">Mise en service</a>
+</nav>
+<main id="folders-container"></main>
 
-  <script>
-    const container = document.getElementById('folders-container');
-    let folders = JSON.parse(localStorage.getItem('folders')) || [];
+<script>
+  const container = document.getElementById('folders-container');
+  let folders = JSON.parse(localStorage.getItem('folders')) || [];
 
-    function toggleContent(index) {
-      const content = document.getElementById('content-' + index);
-      content.style.display = content.style.display === 'none' ? 'block' : 'none';
+  // Toggle folder content visibility and rotate arrow
+  function toggleContent(index) {
+    const content = document.getElementById('content-' + index);
+    const header = document.getElementById('header-' + index);
+    const isOpen = content.style.display === 'block';
+    content.style.display = isOpen ? 'none' : 'block';
+    if(isOpen) header.classList.remove('open'); else header.classList.add('open');
+  }
+
+  // Toggle section visibility and rotate arrow
+  function toggleSection(id) {
+    const section = document.getElementById(id);
+    const title = document.getElementById(id + '-title');
+    const isOpen = section.style.display === 'block';
+    section.style.display = isOpen ? 'none' : 'block';
+    if(isOpen) title.classList.remove('open'); else title.classList.add('open');
+  }
+
+  // Save data on change to localStorage
+  function saveData(folderIndex, field, value) {
+    folders[folderIndex].visiteTechnique = folders[folderIndex].visiteTechnique || {};
+    folders[folderIndex].visiteTechnique[field] = value;
+    localStorage.setItem('folders', JSON.stringify(folders));
+  }
+
+  // For TRAVAUX ENEDIS oui/non exclusif behavior
+  function travauxEnedisToggle(folderIndex, fieldClicked) {
+    const folder = folders[folderIndex];
+    folder.visiteTechnique = folder.visiteTechnique || {};
+    if(fieldClicked === 'pdlPoseOui') {
+      folder.visiteTechnique.pdlPoseOui = true;
+      folder.visiteTechnique.pdlPoseNon = false;
+    } else if(fieldClicked === 'pdlPoseNon') {
+      folder.visiteTechnique.pdlPoseOui = false;
+      folder.visiteTechnique.pdlPoseNon = true;
     }
-
-    function toggleSection(id) {
-      const section = document.getElementById(id);
-      section.style.display = section.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function saveData(index, field, value) {
-      folders[index].visiteTechnique = folders[index].visiteTechnique || {};
-      folders[index].visiteTechnique[field] = value;
-      localStorage.setItem('folders', JSON.stringify(folders));
-    }
-
-    function deleteFolder(index) {
-      if (confirm("Voulez-vous vraiment supprimer ce dossier ?")) {
-        folders.splice(index, 1);
-        localStorage.setItem('folders', JSON.stringify(folders));
-        render();
-      }
-    }
-
-    function render() {
-      container.innerHTML = '';
-      folders.forEach((folder, index) => {
-        const div = document.createElement('div');
-        div.className = 'folder';
-
-        const header = document.createElement('div');
-        header.className = 'folder-header';
-        header.innerHTML = `<strong>${folder.name}</strong><span>▼</span>`;
-        header.onclick = () => toggleContent(index);
-
-        const content = document.createElement('div');
-        content.className = 'folder-content';
-        content.id = 'content-' + index;
-
-        function createSection(title, sectionId) {
-          const section = document.createElement('div');
-          const sectionTitle = document.createElement('div');
-          sectionTitle.className = 'section-title';
-          sectionTitle.innerHTML = `${title} <span>▼</span>`;
-          sectionTitle.onclick = () => toggleSection(sectionId);
-
-          const sectionContent = document.createElement('div');
-          sectionContent.className = 'section-content';
-          sectionContent.id = sectionId;
-
-          section.appendChild(sectionTitle);
-          section.appendChild(sectionContent);
-
-          return { section, sectionContent };
-        }
-
-        const categorie = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`);
-        categorie.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>Type de bâtiment :</label>
-            <select onchange="saveData(${index}, 'typeBatiment', this.value)">
-              <option value="" ${!folder.visiteTechnique?.typeBatiment ? 'selected' : ''}>-- Choisir --</option>
-              <option value="Agricole" ${folder.visiteTechnique?.typeBatiment === 'Agricole' ? 'selected' : ''}>Agricole</option>
-              <option value="Industriel" ${folder.visiteTechnique?.typeBatiment === 'Industriel' ? 'selected' : ''}>Industriel</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Classé :</label>
-            <select onchange="saveData(${index}, 'classement', this.value)">
-              <option value="" ${!folder.visiteTechnique?.classement ? 'selected' : ''}>-- Choisir --</option>
-              <option value="ICPE" ${folder.visiteTechnique?.classement === 'ICPE' ? 'selected' : ''}>ICPE</option>
-              <option value="ERP" ${folder.visiteTechnique?.classement === 'ERP' ? 'selected' : ''}>ERP</option>
-              <option value="ERT" ${folder.visiteTechnique?.classement === 'ERT' ? 'selected' : ''}>ERT</option>
-            </select>
-          </div>
-        `;
-        content.appendChild(categorie.section);
-
-        const dateVisite = createSection('DATE DE VISITE TECHNIQUE', `dateVisite-${index}`);
-        dateVisite.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label>Date de la visite :</label>
-            <input type="date" value="${folder.visiteTechnique?.dateVisite || ''}" onchange="saveData(${index}, 'dateVisite', this.value)">
-          </div>
-        `;
-        content.appendChild(dateVisite.section);
-
-        const sortieAC = createSection('SORTIE CÂBLE AC', `sortieAC-${index}`);
-        sortieAC.sectionContent.innerHTML = `
-          <div class="form-group">
-            <label><input type="checkbox" onchange="saveData(${index}, 'sortieACDroite', this.checked)" ${folder.visiteTechnique?.sortieACDroite ? 'checked' : ''}> Droite</label>
-            <label><input type="checkbox" onchange="saveData(${index}, 'sortieACGauche', this.checked)" ${folder.visiteTechnique?.sortieACGauche ? 'checked' : ''}> Gauche</label>
-          </div>
-        `;
-        content.appendChild(sortieAC.section);
-
-        const printButton = document.createElement('button');
-        printButton.textContent = 'Imprimer ce dossier';
-        printButton.onclick = () => {
-          const originalDisplay = [];
-          content.style.display = 'block';
-          content.querySelectorAll('.section-content').forEach((el, i) => {
-            originalDisplay[i] = el.style.display;
-            el.style.display = 'block';
-          });
-
-          const element = document.createElement('div');
-          element.innerHTML = `<h2>${folder.name}</h2>` + content.innerHTML;
-          const opt = {
-            margin:       0.5,
-            filename:     `${folder.name}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-          };
-
-          html2pdf().from(element).set(opt).save().then(() => {
-            content.querySelectorAll('.section-content').forEach((el, i) => {
-              el.style.display = originalDisplay[i];
-            });
-          });
-        };
-
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Supprimer ce dossier';
-        deleteButton.style.backgroundColor = '#cc0000';
-        deleteButton.onclick = () => deleteFolder(index);
-
-        content.appendChild(printButton);
-        content.appendChild(deleteButton);
-        div.appendChild(header);
-        div.appendChild(content);
-        container.appendChild(div);
-      });
-    }
-
+    localStorage.setItem('folders', JSON.stringify(folders));
     render();
-  </script>
+  }
+
+  function deleteFolder(index) {
+    if(confirm("Voulez-vous vraiment supprimer ce dossier ?")) {
+      folders.splice(index, 1);
+      localStorage.setItem('folders', JSON.stringify(folders));
+      render();
+    }
+  }
+
+  // Print one folder with all sections fully expanded
+  function printFolder(index) {
+    const folder = folders[index];
+    const tempDiv = document.createElement('div');
+    tempDiv.style.padding = "20px";
+    tempDiv.style.fontFamily = "Arial, sans-serif";
+
+    const title = document.createElement('h2');
+    title.textContent = folder.name;
+    tempDiv.appendChild(title);
+
+    // Append each section fully expanded with content
+    function createPrintSection(titleText, htmlContent) {
+      const sectionTitle = document.createElement('h3');
+      sectionTitle.style.backgroundColor = '#e0e0e0';
+      sectionTitle.style.padding = '8px';
+      sectionTitle.style.borderRadius = '4px';
+      sectionTitle.style.marginTop = '20px';
+      sectionTitle.textContent = titleText;
+      tempDiv.appendChild(sectionTitle);
+
+      const sectionContent = document.createElement('div');
+      sectionContent.innerHTML = htmlContent;
+      sectionContent.style.marginTop = '8px';
+      tempDiv.appendChild(sectionContent);
+    }
+
+    const vt = folder.visiteTechnique || {};
+
+    // PLANNING
+    createPrintSection('PLANNING', `
+      <p><strong>Intervention en :</strong> ${vt.interventionEn || ''}</p>
+      <p><strong>Equipe :</strong> ${vt.equipe || ''}</p>
+      <p><strong>Contact chef d\'équipe :</strong> ${vt.contactChefEquipe || ''}</p>
+    `);
+
+    // RACCORDEMENT
+    createPrintSection('RACCORDEMENT', `
+      <p><strong>Type de raccordement :</strong> ${vt.typeRaccordement || ''}</p>
+    `);
+
+    // PUISSANCES
+    createPrintSection('PUISSANCES', `
+      <p><strong>Puissance de raccordement :</strong> ${vt.puissanceRaccordement || ''}</p>
+      <p><strong>Puissance de projet PV :</strong> ${vt.puissanceProjetPV || ''}</p>
+    `);
+
+    // TRAVAUX ENEDIS
+    createPrintSection('TRAVAUX ENEDIS', `
+      <p><strong>PDL posé(s) lors de la VT :</strong> ${vt.pdlPoseOui ? 'Oui' : vt.pdlPoseNon ? 'Non' : ''}</p>
+    `);
+
+    // CATEGORIE DU BATIMENT
+    createPrintSection('CATEGORIE DU BATIMENT', `
+      <p><strong>Type de bâtiment :</strong> ${vt.typeBatiment || ''}</p>
+      <p><strong>Classé :</strong> ${vt.classement || ''}</p>
+    `);
+
+    // DATE DE VISITE TECHNIQUE
+    createPrintSection('DATE DE VISITE TECHNIQUE', `
+      <p><strong>Date de la visite :</strong> ${vt.dateVisite || ''}</p>
+    `);
+
+    // SORTIE CÂBLE AC
+    createPrintSection('SORTIE CÂBLE AC', `
+      <p><strong>Droite :</strong> ${vt.sortieACDroite ? 'Oui' : 'Non'}</p>
+      <p><strong>Gauche :</strong> ${vt.sortieACGauche ? 'Oui' : 'Non'}</p>
+    `);
+
+    // Generate PDF
+    const opt = {
+      margin: 0.5,
+      filename: `${folder.name}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().from(tempDiv).set(opt).save();
+  }
+
+  // Render all folders and their inputs
+  function render() {
+    container.innerHTML = '';
+    folders.forEach((folder, index) => {
+      const div = document.createElement('div');
+      div.className = 'folder';
+
+      // Header with toggle
+      const header = document.createElement('div');
+      header.className = 'folder-header';
+      header.id = 'header-' + index;
+      header.innerHTML = `<span>${folder.name}</span><span>▼</span>`;
+      header.onclick = () => toggleContent(index);
+
+      // Content container
+      const content = document.createElement('div');
+      content.className = 'folder-content';
+      content.id = 'content-' + index;
+
+      // PLANNING section
+      const planningSection = createSection('PLANNING', `planning-${index}`, index);
+      planningSection.sectionContent.innerHTML = `
+        <div class="form-group">
+          <label>Intervention en :</label>
+          <input type="text" value="${folder.visiteTechnique?.interventionEn || ''}" onchange="saveData(${index}, 'interventionEn', this.value)">
+        </div>
+        <div class="form-group">
+          <label>Equipe :</label>
+          <input type="text" value="${folder.visiteTechnique?.equipe || ''}" onchange="saveData(${index}, 'equipe', this.value)">
+        </div>
+        <div class="form-group">
+          <label>Contact chef d'équipe :</label>
+          <input type="text" value="${folder.visiteTechnique?.contactChefEquipe || ''}" onchange="saveData(${index}, 'contactChefEquipe', this.value)">
+        </div>
+      `;
+      content.appendChild(planningSection.section);
+
+      // RACCORDEMENT section
+      const raccordementSection = createSection('RACCORDEMENT', `raccordement-${index}`, index);
+      raccordementSection.sectionContent.innerHTML = `
+        <div class="form-group">
+          <label>Type de raccordement :</label>
+          <input type="text" value="${folder.visiteTechnique?.typeRaccordement || ''}" onchange="saveData(${index}, 'typeRaccordement', this.value)">
+        </div>
+      `;
+      content.appendChild(raccordementSection.section);
+
+      // PUISSANCES section
+      const puissancesSection = createSection('PUISSANCES', `puissances-${index}`, index);
+      puissancesSection.sectionContent.innerHTML = `
+        <div class="form-group">
+          <label>Puissance de raccordement :</label>
+          <input type="text" value="${folder.visiteTechnique?.puissanceRaccordement || ''}" onchange="saveData(${index}, 'puissanceRaccordement', this.value)">
+        </div>
+        <div class="form-group">
+          <label>Puissance de projet PV :</label>
+          <input type="text" value="${folder.visiteTechnique?.puissanceProjetPV || ''}" onchange="saveData(${index}, 'puissanceProjetPV', this.value)">
+        </div>
+      `;
+      content.appendChild(puissancesSection.section);
+
+      // TRAVAUX ENEDIS section with exclusive checkboxes
+      const travauxEnedisSection = createSection('TRAVAUX ENEDIS', `travauxEnedis-${index}`, index);
+      travauxEnedisSection.sectionContent.innerHTML = `
+        <div class="checkbox-group">
+          <label>
+            PDL posé(s) lors de la VT Oui
+            <input type="checkbox" onchange="travauxEnedisToggle(${index}, 'pdlPoseOui')" ${folder.visiteTechnique?.pdlPoseOui ? 'checked' : ''}>
+          </label>
+          <label>
+            PDL posé(s) lors de la VT Non
+            <input type="checkbox" onchange="travauxEnedisToggle(${index}, 'pdlPoseNon')" ${folder.visiteTechnique?.pdlPoseNon ? 'checked' : ''}>
+          </label>
+        </div>
+      `;
+      content.appendChild(travauxEnedisSection.section);
+
+      // CATEGORIE DU BATIMENT section
+      const categorieSection = createSection('CATEGORIE DU BATIMENT', `categorie-${index}`, index);
+      categorieSection.sectionContent.innerHTML = `
+        <div class="form-group">
+          <label>Type de bâtiment :</label>
+          <select onchange="saveData(${index}, 'typeBatiment', this.value)">
+            <option value="" ${!folder.visiteTechnique?.typeBatiment ? 'selected' : ''}>-- Choisir --</option>
+            <option value="Agricole" ${folder.visiteTechnique?.typeBatiment === 'Agricole' ? 'selected' : ''}>Agricole</option>
+            <option value="Industriel" ${folder.visiteTechnique?.typeBatiment === 'Industriel' ? 'selected' : ''}>Industriel</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Classé :</label>
+          <select onchange="saveData(${index}, 'classement', this.value)">
+            <option value="" ${!folder.visiteTechnique?.classement ? 'selected' : ''}>-- Choisir --</option>
+            <option value="ICPE" ${folder.visiteTechnique?.classement === 'ICPE' ? 'selected' : ''}>ICPE</option>
+            <option value="ERP" ${folder.visiteTechnique?.classement === 'ERP' ? 'selected' : ''}>ERP</option>
+            <option value="ERT" ${folder.visiteTechnique?.classement === 'ERT' ? 'selected' : ''}>ERT</option>
+          </select>
+        </div>
+      `;
+      content.appendChild(categorieSection.section);
+
+      // DATE DE VISITE TECHNIQUE section
+      const dateVisiteSection = createSection('DATE DE VISITE TECHNIQUE', `dateVisite-${index}`, index);
+      dateVisiteSection.sectionContent.innerHTML = `
+        <div class="form-group">
+          <label>Date de la visite :</label>
+          <input type="date" value="${folder.visiteTechnique?.dateVisite || ''}" onchange="saveData(${index}, 'dateVisite', this.value)">
+        </div>
+      `;
+      content.appendChild(dateVisiteSection.section);
+
+      // SORTIE CÂBLE AC section
+      const sortieACSection = createSection('SORTIE CÂBLE AC', `sortieAC-${index}`, index);
+      sortieACSection.sectionContent.innerHTML = `
+        <div class="checkbox-group">
+          <label>
+            Droite
+            <input type="checkbox" onchange="saveData(${index}, 'sortieACDroite', this.checked)" ${folder.visiteTechnique?.sortieACDroite ? 'checked' : ''}>
+          </label>
+          <label>
+            Gauche
+            <input type="checkbox" onchange="saveData(${index}, 'sortieACGauche', this.checked)" ${folder.visiteTechnique?.sortieACGauche ? 'checked' : ''}>
+          </label>
+        </div>
+      `;
+      content.appendChild(sortieACSection.section);
+
+      // Buttons print & delete
+      const printBtn = document.createElement('button');
+      printBtn.textContent = 'Imprimer ce dossier';
+      printBtn.onclick = () => printFolder(index);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Supprimer ce dossier';
+      deleteBtn.className = 'delete';
+      deleteBtn.onclick = () => deleteFolder(index);
+
+      content.appendChild(printBtn);
+      content.appendChild(deleteBtn);
+
+      div.appendChild(header);
+      div.appendChild(content);
+      container.appendChild(div);
+    });
+  }
+
+  // Helper: create section with toggle
+  function createSection(title, id, folderIndex) {
+    const section = document.createElement('div');
+
+    const sectionTitle = document.createElement('div');
+    sectionTitle.className = 'section-title';
+    sectionTitle.id = id + '-title';
+    sectionTitle.innerHTML = `${title} <span>▼</span>`;
+    sectionTitle.onclick = () => toggleSection(id);
+
+    const sectionContent = document.createElement('div');
+    sectionContent.className = 'section-content';
+    sectionContent.id = id;
+
+    section.appendChild(sectionTitle);
+    section.appendChild(sectionContent);
+
+    return {section, sectionContent};
+  }
+
+  // Load initial folders or example if none
+  if(folders.length === 0) {
+    folders.push({name: "Exemple de dossier", visiteTechnique: {}});
+    localStorage.setItem('folders', JSON.stringify(folders));
+  }
+
+  render();
+
+  // Expose saveData and travauxEnedisToggle to global scope for inline onchange handlers
+  window.saveData = saveData;
+  window.travauxEnedisToggle = travauxEnedisToggle;
+</script>
 </body>
 </html>
