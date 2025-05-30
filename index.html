@@ -1,378 +1,177 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Action ou Vérité - Couple Sensuel Alterné</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-  body {
-    margin: 0; padding: 0;
-    font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(135deg, #330029, #790000);
-    color: #f8e8e8;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-  }
-  header {
-    margin-top: 20px;
-    text-align: center;
-  }
-  h1 {
-    font-weight: 700;
-    font-size: 2.5em;
-    letter-spacing: 2px;
-    margin-bottom: 5px;
-    color: #ff5e78;
-    text-shadow: 0 0 8px #ff5e78aa;
-  }
-  main {
-    flex: 1;
-    width: 90%;
-    max-width: 450px;
-    background: #420029cc;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 0 15px #ff5e78aa;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  label {
-    margin-top: 10px;
-    font-weight: 600;
-  }
-  input[type="text"], select {
-    width: 100%;
-    padding: 8px 10px;
-    margin-top: 5px;
-    border-radius: 8px;
-    border: none;
-    font-size: 1em;
-    outline: none;
-  }
-  button {
-    margin-top: 20px;
-    background: #ff5e78;
-    border: none;
-    padding: 12px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 1.2em;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 0 8px #ff5e78bb;
-    transition: background 0.3s ease;
-  }
-  button:hover {
-    background: #e04c65;
-  }
-  #game-section {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-  }
-  #prompt {
-    font-size: 1.3em;
-    font-weight: 600;
-    margin-bottom: 15px;
-    text-align: center;
-    min-height: 80px;
-  }
-  #message {
-    margin-bottom: 10px;
-    font-weight: 600;
-    font-size: 1.1em;
-    color: #ff9dbb;
-    text-align: center;
-  }
-  .choice-btns {
-    display: flex;
-    gap: 20px;
-  }
-  .choice-btns button {
-    width: 120px;
-    font-size: 1.1em;
-  }
-  footer {
-    margin: 15px 0;
-    font-size: 0.8em;
-    color: #cc9da1;
-    text-align:center;
-  }
-</style>
-</head>
-<body>
+const players = ["Alice", "Bob", "Clara", "David"];  // Modifie ici les joueurs
+let level = "soft";  // Choix du niveau: "soft", "spicy", "hardcore"
 
-<header>
-  <h1>Action ou Vérité</h1>
-  <div>Édition Sensuelle Alternée - Couple</div>
-</header>
+let currentPlayerIndex = 0;
+let turnCount = 0;
 
-<main>
-  <section id="setup-section">
-    <label for="prenom-femme">Prénom de la femme :</label>
-    <input type="text" id="prenom-femme" placeholder="Ex : Marie" autocomplete="off" />
-
-    <label for="prenom-partenaire">Prénom du partenaire :</label>
-    <input type="text" id="prenom-partenaire" placeholder="Ex : Lucas" autocomplete="off" />
-
-    <label for="niveau">Choisis le niveau :</label>
-    <select id="niveau">
-      <option value="soft">💗 Soft</option>
-      <option value="spicy">🔥 Spicy</option>
-      <option value="hardcore">🔞 Hardcore</option>
-    </select>
-
-    <button id="start-btn">Commencer le jeu</button>
-  </section>
-
-  <section id="game-section">
-    <div id="message"></div>
-    <div id="prompt"></div>
-    <div class="choice-btns">
-      <button id="action-btn">Action</button>
-      <button id="verite-btn">Vérité</button>
-    </div>
-    <button id="next-btn" style="margin-top: 25px; display:none;">Tour suivant</button>
-  </section>
-</main>
-
-<footer>
-  &copy; Jeu privé - Respect, Consentement & Plaisir avant tout.
-</footer>
-
-<script>
-  // Données neutres (actions et vérités mixtes)
-  const neutre = {
+const gameData = {
+  soft: {
     actions: [
-      "Fais un bisou passionné à l'autre joueur.",
-      "Mets ta main sur la cuisse de ton partenaire pendant 30 secondes.",
-      "Chuchote un compliment sexy à l'oreille de l'autre.",
-      "Fais un massage rapide des épaules du partenaire.",
-      "Imite un geste coquin que tu aimes faire.",
-      "Fais un strip-tease pendant 20 secondes.",
-      "Danse langoureusement autour de ton partenaire.",
-      "Embrasse tendrement la main de ton partenaire.",
-      "Raconte un souvenir érotique partagé ensemble.",
-      "Fais un clin d'œil aguicheur au partenaire.",
-      "Sers un verre ou rafraîchis ton partenaire.",
-      "Réalise une petite caresse sur le cou de l'autre.",
-      "Regarde ton partenaire dans les yeux pendant 10 secondes sans parler.",
-      "Mime une scène sexy que tu aimerais réaliser.",
-      "Chante ou murmure une phrase sexy à ton partenaire."
+      "Fais un bisou à la personne à ta gauche.",
+      "Chante une chanson pendant 30 secondes.",
+      "Imite un animal au choix.",
+      "Fais 10 pompes.",
+      "Danse sans musique pendant 1 minute.",
+      "Mange une cuillère de miel.",
+      "Fais un compliment à chaque joueur.",
+      "Raconte une blague drôle.",
+      "Fais une grimace et tiens-la 10 secondes.",
+      "Fais un tour sur toi-même les yeux fermés.",
+      "Montre ton talent caché.",
+      "Fais un dessin avec les yeux fermés.",
+      "Mime une scène de film célèbre.",
+      "Fais une déclaration d'amour drôle.",
+      "Mime un métier improbable.",
+      "Fais un cri d'animal sauvage.",
+      "Imite une célébrité.",
+      "Raconte un secret (pas trop gênant).",
+      "Fais une pose de yoga.",
+      "Fais semblant d'être un robot.",
+      "Fais un câlin à ton voisin.",
+      "Fais une danse ridicule.",
+      "Mime un sport.",
+      "Fais 5 sauts en étoile.",
+      "Raconte un souvenir d'enfance.",
+      "Chante l'alphabet à l'envers.",
+      "Fais une pirouette.",
+      "Fais semblant d'être un super-héros.",
+      "Fais une séance de méditation rapide.",
+      "Fais un compliment à toi-même.",
+      "Imite un bruit d'instrument.",
+      "Fais semblant de jouer au piano.",
+      "Fais une blague avec un jeu de mots.",
+      "Fais un clin d'œil à tout le monde.",
+      "Fais un geste de danse folklorique.",
+      "Raconte une anecdote marrante.",
+      "Fais semblant d'être un pirate.",
+      "Fais un cri de victoire.",
+      "Mime un animal marin.",
+      "Fais 10 secondes de karaoké.",
+      "Fais une pause dramatique.",
+      "Fais une imitation d'un professeur.",
+      "Fais une danse lente.",
+      "Fais un saut sur place.",
+      "Fais une révérence.",
+      "Fais une pose de mannequin.",
+      "Fais un compliment à une célébrité imaginaire.",
+      "Fais une imitation d'un bébé.",
+      "Fais semblant d'être un chat.",
+      "Fais un cri d'alerte drôle.",
+      // Index 14 (15e élément) réservé à l'action anal
+      "Fais un massage anal à un joueur (consentement requis)."
     ],
     verites: [
-      "Quelle est ta plus grande envie secrète en ce moment ?",
-      "Qu'est-ce qui te fait craquer chez ton partenaire ?",
-      "As-tu déjà fantasmé sur un lieu public ?",
-      "Quel est ton endroit préféré pour un baiser passionné ?",
-      "Quel est ton plus grand fantasme non réalisé ?",
-      "Qu'aimes-tu le plus dans votre intimité ?",
-      "Quelle est ta position préférée au lit ?",
-      "As-tu déjà surpris ton partenaire en train de te regarder ?",
-      "Quelle est la chose la plus folle que tu aimerais essayer ?",
-      "Quelle est ta définition d'un moment parfait à deux ?",
-      "Quelle est la partie de ton corps que tu préfères faire toucher ?",
-      "As-tu déjà eu un rêve érotique avec ton partenaire ?",
-      "Quelle est ta tenue préférée pour séduire ?",
-      "As-tu déjà eu un coup de foudre physique instantané ?",
-      "Quelle est ta plus grande peur dans la chambre à coucher ?"
+      "Quelle est ta plus grande peur ?",
+      "As-tu déjà menti pour éviter un problème ?",
+      "Quel est ton plus grand rêve ?",
+      "Quelle est ta couleur préférée ?",
+      "As-tu déjà volé quelque chose ?",
+      "Quelle est ta plus grande honte ?",
+      "Quel est ton plat préféré ?",
+      "As-tu un secret que personne ne connaît ?",
+      "Quelle est ta chanson préférée ?",
+      "Quelle est ta destination de rêve ?",
+      "As-tu déjà pleuré devant un film ?",
+      "Quel est ton plus beau souvenir ?",
+      "As-tu déjà triché à un jeu ?",
+      "Quelle est ta pire habitude ?",
+      "As-tu déjà essayé le sexe anal ? Raconte.", // Index 14 : vérité anal
+      "As-tu un talent caché ?",
+      "Quelle est ta pire bêtise ?",
+      "Quel est ton animal préféré ?",
+      "As-tu déjà fait quelque chose d'illégal ?",
+      "Quelle est ta plus grande réussite ?",
+      "As-tu déjà été jaloux(se) ?",
+      "Quelle est ta plus grande peur secrète ?",
+      "As-tu déjà eu un coup de foudre ?",
+      "Quel est ton film préféré ?",
+      "Quelle est ta pire expérience scolaire ?",
+      "As-tu déjà caché un secret ?",
+      "Quelle est ta plus grande qualité ?",
+      "As-tu un objet fétiche ?",
+      "Quel est ton pire cauchemar ?",
+      "As-tu déjà eu le cœur brisé ?",
+      "Quel est ton meilleur ami ?",
+      "Quelle est ta saison préférée ?",
+      "As-tu déjà eu un rêve bizarre ?",
+      "Quelle est ta boisson préférée ?",
+      "As-tu déjà fait un voyage seul ?",
+      "Quelle est ta plus grande peur d'adulte ?",
+      "As-tu déjà fait un compliment sincère ?",
+      "Quelle est ta plus grande fierté ?",
+      "As-tu déjà cassé quelque chose de précieux ?",
+      "Quelle est ta plus grande passion ?",
+      "As-tu déjà surpris quelqu’un en train de mentir ?",
+      "Quelle est ta plus grande faiblesse ?",
+      "As-tu déjà menti pour éviter un rendez-vous ?",
+      "Quel est ton plus grand secret ?",
+      "Quelle est ta plus grande peur liée à l’avenir ?",
+      "As-tu déjà eu un secret honteux ?",
+      "Quel est ton plus beau cadeau reçu ?",
+      "As-tu déjà trahi un secret ?",
+      "Quelle est ta plus grande peur d’enfant ?",
+      "As-tu déjà été puni ? Pour quoi ?",
+      "Quel est ton meilleur souvenir d'école ?",
+      "As-tu déjà fait une bêtise au travail ?",
+      "Quel est ton plus grand souhait ?",
+      "As-tu déjà regretté une action ?",
+      "Quelle est ta plus grande surprise ?",
+      "As-tu déjà menti à un ami proche ?",
+      "Quel est ton pire défaut ?",
+      "As-tu déjà été surpris en train de faire quelque chose ?",
+      "Quelle est ta plus belle expérience ?",
+      "As-tu déjà été amoureux(se) secrètement ?"
     ]
-  };
+  },
 
-  // Données anal (actions et vérités réservées à la femme)
-  const anal = {
-    soft: {
-      actions: [
-        "Masser doucement tes fesses avec de l'huile pendant 5 minutes.",
-        "Insérer un petit plug anal bien lubrifié pendant 10 minutes.",
-        "Recevoir des baisers et caresses autour de ta zone anale sans pénétration.",
-        "Te caresser doucement le bas du dos en te concentrant sur les sensations."
-      ],
-      verites: [
-        "As-tu déjà fantasmé sur une pratique anale ?",
-        "Quelle est ta plus grande peur à propos de l'anal ?",
-        "Qu'est-ce qui te plaît le plus quand on stimule cette zone ?",
-        "As-tu déjà essayé un jouet anal ? Si oui, lequel ?"
-      ]
-    },
-    spicy: {
-      actions: [
-        "Te faire pénétrer avec un plug vibrant pendant que tu me regardes.",
-        "Être à quatre pattes pendant une stimulation alternée vaginale et anale.",
-        "Être caressée là pendant que j'utilise doucement un sextoy anal.",
-        "Porter un plug pendant qu'on s'embrasse langoureusement."
-      ],
-      verites: [
-        "Quelle partie de ta zone anale préfères-tu qu'on stimule ?",
-        "Avec quel jouet aimerais-tu essayer pour la première fois ?",
-        "Quel est ton fantasme anal préféré ?",
-        "As-tu déjà pensé à la pénétration anale lors d'un moment intime ?"
-      ]
-    },
-    hardcore: {
-      actions: [
-        "Faire l'amour en double stimulation : plug anal + pénétration vaginale.",
-        "Te faire attacher doucement pendant que je prends possession de toi par derrière.",
-        "Garder un plug anal inséré pendant toute la durée du jeu.",
-        "Te pénétrer analement avec un jouet pendant que tu fais un strip-tease."
-      ],
-      verites: [
-        "Quel fantasme anal secret n'as-tu jamais osé avouer ?",
-        "Jusqu'où serais-tu prête à aller ce soir ?",
-        "As-tu déjà expérimenté la pénétration anale profonde ? Raconte.",
-        "Quelle est ta limite ultime en matière d'anal ?"
-      ]
-    }
-  };
-
-  // Éléments DOM
-  const prenomFemmeInput = document.getElementById("prenom-femme");
-  const prenomPartenaireInput = document.getElementById("prenom-partenaire");
-  const niveauSelect = document.getElementById("niveau");
-  const startBtn = document.getElementById("start-btn");
-  const setupSection = document.getElementById("setup-section");
-  const gameSection = document.getElementById("game-section");
-  const promptDiv = document.getElementById("prompt");
-  const messageDiv = document.getElementById("message");
-  const actionBtn = document.getElementById("action-btn");
-  const veriteBtn = document.getElementById("verite-btn");
-  const nextBtn = document.getElementById("next-btn");
-
-  let prenomFemme = "";
-  let prenomPartenaire = "";
-  let niveau = "soft";
-  let currentPlayer = 1; // 1 = femme, 2 = partenaire
-  let turn = 1;
-  const maxTurns = 15;
-
-  // Pour stocker la distribution des cartes : 1 anal sur 15, les autres neutres
-  let deck = [];
-
-  // Mélange tableau
-  function shuffle(array) {
-    for(let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  }
-
-  // Préparer le deck avec 1 carte anal aléatoire et 14 cartes neutres
-  function prepareDeck() {
-    deck = [];
-    // Tirer 1 carte anal (choisir aléatoirement action ou vérité)
-    const analType = Math.random() < 0.5 ? "actions" : "verites";
-    const analList = anal[niveau][analType];
-    const analCard = { type: analType, text: analList[Math.floor(Math.random()*analList.length)], anal:true };
-    deck.push(analCard);
-    // 14 cartes neutres (tirées aléatoirement dans actions ou vérités)
-    for(let i=0; i<14; i++) {
-      const type = Math.random() < 0.5 ? "actions" : "verites";
-      const list = neutre[type];
-      const text = list[Math.floor(Math.random()*list.length)];
-      deck.push({ type, text, anal:false });
-    }
-    shuffle(deck);
-  }
-
-  // Afficher le joueur actuel (nom)
-  function getCurrentPlayerName() {
-    return currentPlayer === 1 ? prenomFemme : prenomPartenaire;
-  }
-
-  // Afficher le message du tour
-  function updateMessage() {
-    const playerName = getCurrentPlayerName();
-    messageDiv.textContent = `Tour ${turn} / ${maxTurns} - C'est à ${playerName} de jouer`;
-  }
-
-  // Afficher une carte en fonction du choix (action ou vérité)
-  function showCard(choice) {
-    // Trouver la carte correspondante dans le deck
-    // Carte du tour = deck[turn-1]
-    const card = deck[turn - 1];
-    // Si carte anal et joueur ≠ femme, on indique que cette carte est réservée à la femme
-    if(card.anal && currentPlayer !== 1) {
-      promptDiv.textContent = `Cette action ou vérité anal est réservée à ${prenomFemme}. Passe ton tour ou change de choix.`;
-      return false;
-    }
-    // Si type ne correspond pas au choix (action/verité), on adapte
-    if(card.type !== choice) {
-      // On cherche dans la même carte la bonne catégorie (c'est pour gérer car carte a un seul type)
-      // Ici, la carte ne change, on affiche seulement la catégorie choisie
-      // Mais on a un seul texte donc on ne change pas, on oblige le choix du type de la carte
-      // Pour simplifier, on force le choix du type au lancement du tour (voir plus bas)
-      promptDiv.textContent = card.text;
-    } else {
-      promptDiv.textContent = card.text;
-    }
-    return true;
-  }
-
-  // Gestion des clics
-  startBtn.onclick = () => {
-    prenomFemme = prenomFemmeInput.value.trim() || "Elle";
-    prenomPartenaire = prenomPartenaireInput.value.trim() || "Lui";
-    niveau = niveauSelect.value;
-    setupSection.style.display = "none";
-    gameSection.style.display = "flex";
-    currentPlayer = 1;
-    turn = 1;
-    prepareDeck();
-    updateMessage();
-    promptDiv.textContent = "";
-    actionBtn.style.display = "inline-block";
-    veriteBtn.style.display = "inline-block";
-    nextBtn.style.display = "none";
-  };
-
-  let carteMontree = false;
-
-  actionBtn.onclick = () => {
-    if(carteMontree) return;
-    if(showCard("actions")) {
-      carteMontree = true;
-      actionBtn.style.display = "none";
-      veriteBtn.style.display = "none";
-      nextBtn.style.display = "inline-block";
-    }
-  };
-
-  veriteBtn.onclick = () => {
-    if(carteMontree) return;
-    if(showCard("verites")) {
-      carteMontree = true;
-      actionBtn.style.display = "none";
-      veriteBtn.style.display = "none";
-      nextBtn.style.display = "inline-block";
-    }
-  };
-
-  nextBtn.onclick = () => {
-    turn++;
-    if(turn > maxTurns) {
-      // Fin du jeu
-      promptDiv.textContent = `Le jeu est terminé. Merci d'avoir joué !`;
-      messageDiv.textContent = "";
-      actionBtn.style.display = "none";
-      veriteBtn.style.display = "none";
-      nextBtn.style.display = "none";
-      return;
-    }
-    // Alternance joueur
-    currentPlayer = currentPlayer === 1 ? 2 : 1;
-    updateMessage();
-    promptDiv.textContent = "";
-    carteMontree = false;
-    actionBtn.style.display = "inline-block";
-    veriteBtn.style.display = "inline-block";
-    nextBtn.style.display = "none";
-  };
-</script>
-
-</body>
-</html>
+  spicy: {
+    actions: [
+      "Embrasse le joueur à ta droite pendant 10 secondes.",
+      "Enlève un vêtement au choix.",
+      "Fais un massage sensuel à la personne en face de toi.",
+      "Chuchote une phrase coquine à l’oreille du joueur à ta gauche.",
+      "Fais un strip-tease partiel pendant 30 secondes.",
+      "Lèche la joue d’un joueur au hasard.",
+      "Fais un bisou sur le cou de la personne la plus proche.",
+      "Imite un baiser langoureux pendant 15 secondes.",
+      "Fais un compliment sexy à un joueur.",
+      "Danse de façon sensuelle pendant 1 minute.",
+      "Mordille doucement l’oreille d’un joueur.",
+      "Fais une déclaration coquine à ton crush.",
+      "Fais un massage des pieds à quelqu’un.",
+      "Fais un câlin prolongé à un joueur au choix.",
+      "Imite une scène romantique d’un film célèbre.",
+      "Fais un bisou sur le ventre de quelqu’un.",
+      "Fais un clin d’œil sexy à un joueur.",
+      "Fais un massage du dos à la personne à ta droite.",
+      "Fais semblant d’envoyer un SMS coquin.",
+      "Fais un slow avec la personne de ton choix.",
+      "Lèche un glaçon sur le cou d’un joueur.",
+      "Fais un compliment sur le corps d’un joueur.",
+      "Chante une chanson d’amour à quelqu’un.",
+      "Fais un massage des mains à la personne la plus proche.",
+      "Fais un bisou dans le cou à un joueur.",
+      "Fais une pose sexy pendant 20 secondes.",
+      "Chuchote un secret coquin à un joueur.",
+      "Fais semblant d’écrire un poème d’amour.",
+      "Fais un massage des épaules à quelqu’un.",
+      "Fais une danse provocante.",
+      "Fais un bisou sur la joue à tous les joueurs.",
+      "Fais semblant d’appeler ton crush.",
+      "Fais un massage des jambes à une personne.",
+      "Fais un compliment coquin à un joueur.",
+      "Fais un bisou sur les lèvres d’un joueur (consentement obligatoire).",
+      "Fais un slow sur place avec un joueur.",
+      "Imite une star sexy.",
+      "Fais un câlin prolongé à la personne à ta gauche.",
+      "Fais un massage du visage à quelqu’un.",
+      "Fais une déclaration d’amour amusante.",
+      "Fais semblant de séduire un joueur.",
+      "Fais un bisou dans le cou à la personne à ta droite.",
+      "Fais un compliment sur les yeux d’un joueur.",
+      "Fais un massage des bras à quelqu’un.",
+      "Fais un slow en fermant les yeux.",
+      "Fais un bisou sur la main à un joueur.",
+      "Chuchote un mot doux à quelqu’un.",
+      "Fais une danse sensuelle avec un joueur.",
+      "Fais un massage des pieds à la personne à ta gauche.",
