@@ -3,312 +3,252 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Accueil - Export PDF</title>
+<title>Action ou Vérité - Couple Sensuel</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
   body {
-    font-family: Arial, sans-serif;
     margin: 0; padding: 0;
-    background-color: #f9f9f9;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #330029, #790000);
+    color: #f8e8e8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
   }
   header {
-    background-color: #007acc;
-    color: white;
-    padding: 15px 20px;
+    margin-top: 20px;
     text-align: center;
   }
-  nav {
-    display: flex;
-    background-color: #005a99;
-  }
-  nav a {
-    flex: 1;
-    color: white;
-    text-align: center;
-    padding: 15px 0;
-    text-decoration: none;
-    border-right: 1px solid #004c82;
-  }
-  nav a:last-child {
-    border-right: none;
-  }
-  nav a.active, nav a:hover {
-    background-color: #004c82;
-    font-weight: bold;
+  h1 {
+    font-weight: 700;
+    font-size: 2.5em;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    color: #ff5e78;
+    text-shadow: 0 0 8px #ff5e78aa;
   }
   main {
-    max-width: 900px;
-    margin: 20px auto;
-    background: white;
+    flex: 1;
+    width: 90%;
+    max-width: 400px;
+    background: #420029cc;
+    border-radius: 15px;
     padding: 20px;
+    box-shadow: 0 0 15px #ff5e78aa;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  label {
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  input[type="text"], select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px;
     border-radius: 8px;
-  }
-  form {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  form input[type="text"] {
-    flex-grow: 1;
-    padding: 10px;
-    font-size: 16px;
-  }
-  form button {
-    background-color: #007acc;
     border: none;
+    font-size: 1em;
+    outline: none;
+  }
+  button {
+    margin-top: 20px;
+    background: #ff5e78;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.2em;
     color: white;
-    padding: 10px 20px;
-    font-weight: bold;
     cursor: pointer;
+    box-shadow: 0 0 8px #ff5e78bb;
+    transition: background 0.3s ease;
   }
-  ul#folders-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  button:hover {
+    background: #e04c65;
   }
-  ul#folders-list li {
-    display: flex;
-    flex-wrap: wrap;
+  #game-section {
+    display: none;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
+    margin-top: 20px;
   }
-  .folder-name {
-    font-weight: bold;
-    font-size: 18px;
-    flex: 1 1 100%;
-    margin-bottom: 8px;
+  #prompt {
+    font-size: 1.3em;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+    min-height: 80px;
   }
-  .checkboxes {
+  .choice-btns {
     display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    flex: 1 1 auto;
+    gap: 20px;
   }
-  .checkboxes label {
-    cursor: pointer;
-    font-size: 14px;
-    user-select: none;
+  .choice-btns button {
+    width: 120px;
+    font-size: 1.1em;
   }
-  .checkboxes input[type="checkbox"] {
-    margin-right: 6px;
-    width: 18px;
-    height: 18px;
-  }
-  .actions {
-    flex-shrink: 0;
-    display: flex;
-    gap: 10px;
-  }
-  .actions button {
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 4px;
-    border: none;
-    font-weight: bold;
-  }
-  .delete-btn {
-    background-color: #e74c3c;
-    color: white;
-  }
-  .delete-btn:hover {
-    background-color: #c0392b;
-  }
-  .export-btn {
-    background-color: #27ae60;
-    color: white;
-  }
-  .export-btn:hover {
-    background-color: #1e8449;
+  footer {
+    margin: 15px 0;
+    font-size: 0.8em;
+    color: #cc9da1;
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Accueil</h1>
+  <h1>Action ou Vérité</h1>
+  <div>Édition Sensuelle Anal - Pour Elle</div>
 </header>
 
-<nav>
-  <a href="index.html" class="active">Accueil</a>
-  <a href="visite-technique.html">Visite technique</a>
-  <a href="suivi-chantier.html">Suivi de chantier</a>
-  <a href="mise-en-service.html">Mise en service</a>
-</nav>
-
 <main>
-  <form id="folder-form">
-    <input type="text" id="folder-name" placeholder="Nom du dossier" required minlength="1" />
-    <button type="submit">Créer dossier</button>
-  </form>
+  <section id="setup-section">
+    <label for="prenom-femme">Prénom de la femme :</label>
+    <input type="text" id="prenom-femme" placeholder="Ex : Marie" autocomplete="off" />
 
-  <ul id="folders-list"></ul>
+    <label for="prenom-partenaire">Prénom du partenaire :</label>
+    <input type="text" id="prenom-partenaire" placeholder="Ex : Lucas" autocomplete="off" />
+
+    <label for="niveau">Choisis le niveau :</label>
+    <select id="niveau">
+      <option value="soft">💗 Soft</option>
+      <option value="spicy">🔥 Spicy</option>
+      <option value="hardcore">🔞 Hardcore</option>
+    </select>
+
+    <button id="start-btn">Commencer le jeu</button>
+  </section>
+
+  <section id="game-section">
+    <div id="message"></div>
+    <div id="intro" style="margin-bottom: 15px; text-align:center;"></div>
+    <div id="prompt"></div>
+    <div class="choice-btns">
+      <button id="action-btn">Action</button>
+      <button id="verite-btn">Vérité</button>
+    </div>
+    <button id="next-btn" style="margin-top: 25px; display:none;">Tour suivant</button>
+  </section>
 </main>
 
-<!-- jsPDF CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<footer>
+  &copy; Jeu privé - Respect, Consentement & Plaisir avant tout.
+</footer>
+
 <script>
-  const { jsPDF } = window.jspdf;
-
-  const folderForm = document.getElementById('folder-form');
-  const folderNameInput = document.getElementById('folder-name');
-  const foldersList = document.getElementById('folders-list');
-
-  let folders = JSON.parse(localStorage.getItem('folders')) || [];
-
-  function saveFolders() {
-    localStorage.setItem('folders', JSON.stringify(folders));
-  }
-
-  function createFolderElement(folder) {
-    const li = document.createElement('li');
-    li.dataset.id = folder.id;
-
-    const nameDiv = document.createElement('div');
-    nameDiv.className = 'folder-name';
-    nameDiv.textContent = folder.name;
-
-    const checkboxesDiv = document.createElement('div');
-    checkboxesDiv.className = 'checkboxes';
-
-    ['visite-technique', 'suivi-chantier', 'mise-en-service'].forEach(key => {
-      const labelTextMap = {
-        'visite-technique': 'Visite technique',
-        'suivi-chantier': 'Suivi chantier',
-        'mise-en-service': 'Mise en service'
-      };
-      const label = document.createElement('label');
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = folder.checkedStates[key] || false;
-      checkbox.dataset.key = key;
-      checkbox.addEventListener('change', () => {
-        folder.checkedStates[key] = checkbox.checked;
-        saveFolders();
-      });
-      label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(labelTextMap[key]));
-      checkboxesDiv.appendChild(label);
-    });
-
-    const actionsDiv = document.createElement('div');
-    actionsDiv.className = 'actions';
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'Supprimer';
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.addEventListener('click', () => {
-      if (confirm(`Voulez-vous vraiment supprimer le dossier "${folder.name}" ?`)) {
-        folders = folders.filter(f => f.id !== folder.id);
-        saveFolders();
-        renderFolders();
-      }
-    });
-
-    const exportBtn = document.createElement('button');
-    exportBtn.textContent = 'Exporter PDF';
-    exportBtn.className = 'export-btn';
-    exportBtn.addEventListener('click', () => {
-      exportPDF(folder);
-    });
-
-    actionsDiv.appendChild(deleteBtn);
-    actionsDiv.appendChild(exportBtn);
-
-    li.appendChild(nameDiv);
-    li.appendChild(checkboxesDiv);
-    li.appendChild(actionsDiv);
-
-    return li;
-  }
-
-  function renderFolders() {
-    foldersList.innerHTML = '';
-    if (folders.length === 0) {
-      foldersList.innerHTML = '<p>Aucun dossier créé pour l’instant.</p>';
-      return;
+  const data = {
+    soft: {
+      actions: [
+        "Masser doucement tes fesses avec de l'huile pendant 5 minutes.",
+        "Insérer un petit plug anal bien lubrifié pendant 10 minutes.",
+        "Recevoir des baisers et caresses autour de ta zone anale sans pénétration.",
+        "Te caresser doucement le bas du dos en te concentrant sur les sensations.",
+      ],
+      verites: [
+        "As-tu déjà fantasmé sur une pratique anale ?",
+        "Quelle est ta plus grande peur à propos de l'anal ?",
+        "Qu'est-ce qui te plaît le plus quand on stimule cette zone ?",
+        "As-tu déjà essayé un jouet anal ? Si oui, lequel ?",
+      ]
+    },
+    spicy: {
+      actions: [
+        "Te faire pénétrer avec un plug vibrant pendant que tu me regardes.",
+        "Être à quatre pattes pendant une stimulation alternée vaginale et anale.",
+        "Être caressée là pendant que j'utilise doucement un sextoy anal.",
+        "Porter un plug pendant qu'on s'embrasse langoureusement.",
+      ],
+      verites: [
+        "Quelle partie de ta zone anale préfères-tu qu'on stimule ?",
+        "Avec quel jouet aimerais-tu essayer pour la première fois ?",
+        "Quel est ton fantasme anal préféré ?",
+        "As-tu déjà pensé à la pénétration anale lors d'un moment intime ?",
+      ]
+    },
+    hardcore: {
+      actions: [
+        "Faire l'amour en double stimulation : plug anal + pénétration vaginale.",
+        "Te faire attacher doucement pendant que je prends possession de toi par derrière.",
+        "Garder un plug anal inséré pendant toute la durée du jeu.",
+        "Te pénétrer analement avec un jouet pendant que tu fais un strip-tease.",
+      ],
+      verites: [
+        "Quel fantasme anal secret n'as-tu jamais osé avouer ?",
+        "Jusqu'où serais-tu prête à aller ce soir ?",
+        "As-tu déjà expérimenté la pénétration anale profonde ? Raconte.",
+        "Quelle est ta limite ultime en matière d'anal ?",
+      ]
     }
-    folders.forEach(folder => {
-      foldersList.appendChild(createFolderElement(folder));
-    });
+  };
+
+  const prenomFemmeInput = document.getElementById("prenom-femme");
+  const prenomPartenaireInput = document.getElementById("prenom-partenaire");
+  const niveauSelect = document.getElementById("niveau");
+  const startBtn = document.getElementById("start-btn");
+  const setupSection = document.getElementById("setup-section");
+  const gameSection = document.getElementById("game-section");
+  const promptDiv = document.getElementById("prompt");
+  const messageDiv = document.getElementById("message");
+  const introDiv = document.getElementById("intro");
+  const actionBtn = document.getElementById("action-btn");
+  const veriteBtn = document.getElementById("verite-btn");
+  const nextBtn = document.getElementById("next-btn");
+
+  let prenomFemme, prenomPartenaire, niveau;
+  let gameStarted = false;
+
+  function getRandomItem(array) {
+    return array[Math.floor(Math.random() * array.length)];
   }
 
-  folderForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const name = folderNameInput.value.trim();
-    if (name === '') return;
+  function resetTurn() {
+    promptDiv.textContent = "";
+    actionBtn.style.display = "inline-block";
+    veriteBtn.style.display = "inline-block";
+    nextBtn.style.display = "none";
+    messageDiv.textContent = "";
+  }
 
-    const newFolder = {
-      id: Date.now(),
-      name,
-      checkedStates: {
-        'visite-technique': false,
-        'suivi-chantier': false,
-        'mise-en-service': false
-      }
-    };
-    folders.push(newFolder);
-    saveFolders();
-    renderFolders();
-    folderNameInput.value = '';
-    folderNameInput.focus();
+  startBtn.addEventListener("click", () => {
+    prenomFemme = prenomFemmeInput.value.trim() || "Elle";
+    prenomPartenaire = prenomPartenaireInput.value.trim() || "Lui";
+    niveau = niveauSelect.value;
+
+    setupSection.style.display = "none";
+    gameSection.style.display = "flex";
+
+    introDiv.textContent = `C'est le tour de ${prenomFemme}. Choisis : Action ou Vérité ?`;
+    resetTurn();
+    gameStarted = true;
   });
 
-  function exportPDF(folder) {
-    const pdf = new jsPDF();
+  actionBtn.addEventListener("click", () => {
+    if (!gameStarted) return;
+    const action = getRandomItem(data[niveau].actions);
+    promptDiv.textContent = `${prenomFemme}, ${action}`;
+    actionBtn.style.display = "none";
+    veriteBtn.style.display = "none";
+    nextBtn.style.display = "inline-block";
+    messageDiv.textContent = "N'oubliez pas le consentement et le mot sécurité.";
+  });
 
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(12);
+  veriteBtn.addEventListener("click", () => {
+    if (!gameStarted) return;
+    const verite = getRandomItem(data[niveau].verites);
+    promptDiv.textContent = `${prenomFemme}, ${verite}`;
+    actionBtn.style.display = "none";
+    veriteBtn.style.display = "none";
+    nextBtn.style.display = "inline-block";
+    messageDiv.textContent = "Réponds honnêtement et en toute confiance.";
+  });
 
-    let y = 10;
-    pdf.text(`Dossier : ${folder.name}`, 10, y);
-    y += 10;
-
-    if (folder.checkedStates['visite-technique']) {
-      pdf.setFont(undefined, 'bold');
-      pdf.text("Visite Technique", 10, y);
-      y += 7;
-      pdf.setFont(undefined, 'normal');
-      pdf.text("Contenu de la visite technique ici...", 10, y);
-      y += 12;
-    }
-    if (folder.checkedStates['suivi-chantier']) {
-      pdf.setFont(undefined, 'bold');
-      pdf.text("Suivi de Chantier", 10, y);
-      y += 7;
-      pdf.setFont(undefined, 'normal');
-      pdf.text("Contenu du suivi chantier ici...", 10, y);
-      y += 12;
-    }
-    if (folder.checkedStates['mise-en-service']) {
-      pdf.setFont(undefined, 'bold');
-      pdf.text("Mise en Service", 10, y);
-      y += 7;
-      pdf.setFont(undefined, 'normal');
-      pdf.text("Contenu de la mise en service ici...", 10, y);
-      y += 12;
-    }
-
-    // Générer un Blob et forcer téléchargement
-    const pdfBlob = pdf.output('blob');
-    const url = URL.createObjectURL(pdfBlob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Dossier_${folder.name}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    URL.revokeObjectURL(url);
-
-    // Message sur mobile pour expliquer l'ouverture
-    if (/Mobi|Android/i.test(navigator.userAgent)) {
-      alert("Le PDF s'est ouvert dans un nouvel onglet. Sur mobile, utilisez les options de partage ou d'enregistrement de votre navigateur pour sauvegarder le fichier.");
-    }
-  }
-
-  renderFolders();
+  nextBtn.addEventListener("click", () => {
+    introDiv.textContent = `À nouveau, ${prenomFemme}, Action ou Vérité ?`;
+    resetTurn();
+  });
 </script>
 
 </body>
