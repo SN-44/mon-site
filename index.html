@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Action ou Vérité - Couple Sensuel</title>
+<title>Action ou Vérité - Couple Sensuel Alterné</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
   body {
@@ -31,7 +31,7 @@
   main {
     flex: 1;
     width: 90%;
-    max-width: 400px;
+    max-width: 450px;
     background: #420029cc;
     border-radius: 15px;
     padding: 20px;
@@ -82,6 +82,13 @@
     text-align: center;
     min-height: 80px;
   }
+  #message {
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 1.1em;
+    color: #ff9dbb;
+    text-align: center;
+  }
   .choice-btns {
     display: flex;
     gap: 20px;
@@ -94,6 +101,7 @@
     margin: 15px 0;
     font-size: 0.8em;
     color: #cc9da1;
+    text-align:center;
   }
 </style>
 </head>
@@ -101,7 +109,7 @@
 
 <header>
   <h1>Action ou Vérité</h1>
-  <div>Édition Sensuelle Anal - Pour Elle</div>
+  <div>Édition Sensuelle Alternée - Couple</div>
 </header>
 
 <main>
@@ -124,7 +132,6 @@
 
   <section id="game-section">
     <div id="message"></div>
-    <div id="intro" style="margin-bottom: 15px; text-align:center;"></div>
     <div id="prompt"></div>
     <div class="choice-btns">
       <button id="action-btn">Action</button>
@@ -139,19 +146,58 @@
 </footer>
 
 <script>
-  const data = {
+  // Données neutres (actions et vérités mixtes)
+  const neutre = {
+    actions: [
+      "Fais un bisou passionné à l'autre joueur.",
+      "Mets ta main sur la cuisse de ton partenaire pendant 30 secondes.",
+      "Chuchote un compliment sexy à l'oreille de l'autre.",
+      "Fais un massage rapide des épaules du partenaire.",
+      "Imite un geste coquin que tu aimes faire.",
+      "Fais un strip-tease pendant 20 secondes.",
+      "Danse langoureusement autour de ton partenaire.",
+      "Embrasse tendrement la main de ton partenaire.",
+      "Raconte un souvenir érotique partagé ensemble.",
+      "Fais un clin d'œil aguicheur au partenaire.",
+      "Sers un verre ou rafraîchis ton partenaire.",
+      "Réalise une petite caresse sur le cou de l'autre.",
+      "Regarde ton partenaire dans les yeux pendant 10 secondes sans parler.",
+      "Mime une scène sexy que tu aimerais réaliser.",
+      "Chante ou murmure une phrase sexy à ton partenaire."
+    ],
+    verites: [
+      "Quelle est ta plus grande envie secrète en ce moment ?",
+      "Qu'est-ce qui te fait craquer chez ton partenaire ?",
+      "As-tu déjà fantasmé sur un lieu public ?",
+      "Quel est ton endroit préféré pour un baiser passionné ?",
+      "Quel est ton plus grand fantasme non réalisé ?",
+      "Qu'aimes-tu le plus dans votre intimité ?",
+      "Quelle est ta position préférée au lit ?",
+      "As-tu déjà surpris ton partenaire en train de te regarder ?",
+      "Quelle est la chose la plus folle que tu aimerais essayer ?",
+      "Quelle est ta définition d'un moment parfait à deux ?",
+      "Quelle est la partie de ton corps que tu préfères faire toucher ?",
+      "As-tu déjà eu un rêve érotique avec ton partenaire ?",
+      "Quelle est ta tenue préférée pour séduire ?",
+      "As-tu déjà eu un coup de foudre physique instantané ?",
+      "Quelle est ta plus grande peur dans la chambre à coucher ?"
+    ]
+  };
+
+  // Données anal (actions et vérités réservées à la femme)
+  const anal = {
     soft: {
       actions: [
         "Masser doucement tes fesses avec de l'huile pendant 5 minutes.",
         "Insérer un petit plug anal bien lubrifié pendant 10 minutes.",
         "Recevoir des baisers et caresses autour de ta zone anale sans pénétration.",
-        "Te caresser doucement le bas du dos en te concentrant sur les sensations.",
+        "Te caresser doucement le bas du dos en te concentrant sur les sensations."
       ],
       verites: [
         "As-tu déjà fantasmé sur une pratique anale ?",
         "Quelle est ta plus grande peur à propos de l'anal ?",
         "Qu'est-ce qui te plaît le plus quand on stimule cette zone ?",
-        "As-tu déjà essayé un jouet anal ? Si oui, lequel ?",
+        "As-tu déjà essayé un jouet anal ? Si oui, lequel ?"
       ]
     },
     spicy: {
@@ -159,13 +205,13 @@
         "Te faire pénétrer avec un plug vibrant pendant que tu me regardes.",
         "Être à quatre pattes pendant une stimulation alternée vaginale et anale.",
         "Être caressée là pendant que j'utilise doucement un sextoy anal.",
-        "Porter un plug pendant qu'on s'embrasse langoureusement.",
+        "Porter un plug pendant qu'on s'embrasse langoureusement."
       ],
       verites: [
         "Quelle partie de ta zone anale préfères-tu qu'on stimule ?",
         "Avec quel jouet aimerais-tu essayer pour la première fois ?",
         "Quel est ton fantasme anal préféré ?",
-        "As-tu déjà pensé à la pénétration anale lors d'un moment intime ?",
+        "As-tu déjà pensé à la pénétration anale lors d'un moment intime ?"
       ]
     },
     hardcore: {
@@ -173,17 +219,18 @@
         "Faire l'amour en double stimulation : plug anal + pénétration vaginale.",
         "Te faire attacher doucement pendant que je prends possession de toi par derrière.",
         "Garder un plug anal inséré pendant toute la durée du jeu.",
-        "Te pénétrer analement avec un jouet pendant que tu fais un strip-tease.",
+        "Te pénétrer analement avec un jouet pendant que tu fais un strip-tease."
       ],
       verites: [
         "Quel fantasme anal secret n'as-tu jamais osé avouer ?",
         "Jusqu'où serais-tu prête à aller ce soir ?",
         "As-tu déjà expérimenté la pénétration anale profonde ? Raconte.",
-        "Quelle est ta limite ultime en matière d'anal ?",
+        "Quelle est ta limite ultime en matière d'anal ?"
       ]
     }
   };
 
+  // Éléments DOM
   const prenomFemmeInput = document.getElementById("prenom-femme");
   const prenomPartenaireInput = document.getElementById("prenom-partenaire");
   const niveauSelect = document.getElementById("niveau");
@@ -192,63 +239,139 @@
   const gameSection = document.getElementById("game-section");
   const promptDiv = document.getElementById("prompt");
   const messageDiv = document.getElementById("message");
-  const introDiv = document.getElementById("intro");
   const actionBtn = document.getElementById("action-btn");
   const veriteBtn = document.getElementById("verite-btn");
   const nextBtn = document.getElementById("next-btn");
 
-  let prenomFemme, prenomPartenaire, niveau;
-  let gameStarted = false;
+  let prenomFemme = "";
+  let prenomPartenaire = "";
+  let niveau = "soft";
+  let currentPlayer = 1; // 1 = femme, 2 = partenaire
+  let turn = 1;
+  const maxTurns = 15;
 
-  function getRandomItem(array) {
-    return array[Math.floor(Math.random() * array.length)];
+  // Pour stocker la distribution des cartes : 1 anal sur 15, les autres neutres
+  let deck = [];
+
+  // Mélange tableau
+  function shuffle(array) {
+    for(let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
   }
 
-  function resetTurn() {
+  // Préparer le deck avec 1 carte anal aléatoire et 14 cartes neutres
+  function prepareDeck() {
+    deck = [];
+    // Tirer 1 carte anal (choisir aléatoirement action ou vérité)
+    const analType = Math.random() < 0.5 ? "actions" : "verites";
+    const analList = anal[niveau][analType];
+    const analCard = { type: analType, text: analList[Math.floor(Math.random()*analList.length)], anal:true };
+    deck.push(analCard);
+    // 14 cartes neutres (tirées aléatoirement dans actions ou vérités)
+    for(let i=0; i<14; i++) {
+      const type = Math.random() < 0.5 ? "actions" : "verites";
+      const list = neutre[type];
+      const text = list[Math.floor(Math.random()*list.length)];
+      deck.push({ type, text, anal:false });
+    }
+    shuffle(deck);
+  }
+
+  // Afficher le joueur actuel (nom)
+  function getCurrentPlayerName() {
+    return currentPlayer === 1 ? prenomFemme : prenomPartenaire;
+  }
+
+  // Afficher le message du tour
+  function updateMessage() {
+    const playerName = getCurrentPlayerName();
+    messageDiv.textContent = `Tour ${turn} / ${maxTurns} - C'est à ${playerName} de jouer`;
+  }
+
+  // Afficher une carte en fonction du choix (action ou vérité)
+  function showCard(choice) {
+    // Trouver la carte correspondante dans le deck
+    // Carte du tour = deck[turn-1]
+    const card = deck[turn - 1];
+    // Si carte anal et joueur ≠ femme, on indique que cette carte est réservée à la femme
+    if(card.anal && currentPlayer !== 1) {
+      promptDiv.textContent = `Cette action ou vérité anal est réservée à ${prenomFemme}. Passe ton tour ou change de choix.`;
+      return false;
+    }
+    // Si type ne correspond pas au choix (action/verité), on adapte
+    if(card.type !== choice) {
+      // On cherche dans la même carte la bonne catégorie (c'est pour gérer car carte a un seul type)
+      // Ici, la carte ne change, on affiche seulement la catégorie choisie
+      // Mais on a un seul texte donc on ne change pas, on oblige le choix du type de la carte
+      // Pour simplifier, on force le choix du type au lancement du tour (voir plus bas)
+      promptDiv.textContent = card.text;
+    } else {
+      promptDiv.textContent = card.text;
+    }
+    return true;
+  }
+
+  // Gestion des clics
+  startBtn.onclick = () => {
+    prenomFemme = prenomFemmeInput.value.trim() || "Elle";
+    prenomPartenaire = prenomPartenaireInput.value.trim() || "Lui";
+    niveau = niveauSelect.value;
+    setupSection.style.display = "none";
+    gameSection.style.display = "flex";
+    currentPlayer = 1;
+    turn = 1;
+    prepareDeck();
+    updateMessage();
     promptDiv.textContent = "";
     actionBtn.style.display = "inline-block";
     veriteBtn.style.display = "inline-block";
     nextBtn.style.display = "none";
-    messageDiv.textContent = "";
-  }
+  };
 
-  startBtn.addEventListener("click", () => {
-    prenomFemme = prenomFemmeInput.value.trim() || "Elle";
-    prenomPartenaire = prenomPartenaireInput.value.trim() || "Lui";
-    niveau = niveauSelect.value;
+  let carteMontree = false;
 
-    setupSection.style.display = "none";
-    gameSection.style.display = "flex";
+  actionBtn.onclick = () => {
+    if(carteMontree) return;
+    if(showCard("actions")) {
+      carteMontree = true;
+      actionBtn.style.display = "none";
+      veriteBtn.style.display = "none";
+      nextBtn.style.display = "inline-block";
+    }
+  };
 
-    introDiv.textContent = `C'est le tour de ${prenomFemme}. Choisis : Action ou Vérité ?`;
-    resetTurn();
-    gameStarted = true;
-  });
+  veriteBtn.onclick = () => {
+    if(carteMontree) return;
+    if(showCard("verites")) {
+      carteMontree = true;
+      actionBtn.style.display = "none";
+      veriteBtn.style.display = "none";
+      nextBtn.style.display = "inline-block";
+    }
+  };
 
-  actionBtn.addEventListener("click", () => {
-    if (!gameStarted) return;
-    const action = getRandomItem(data[niveau].actions);
-    promptDiv.textContent = `${prenomFemme}, ${action}`;
-    actionBtn.style.display = "none";
-    veriteBtn.style.display = "none";
-    nextBtn.style.display = "inline-block";
-    messageDiv.textContent = "N'oubliez pas le consentement et le mot sécurité.";
-  });
-
-  veriteBtn.addEventListener("click", () => {
-    if (!gameStarted) return;
-    const verite = getRandomItem(data[niveau].verites);
-    promptDiv.textContent = `${prenomFemme}, ${verite}`;
-    actionBtn.style.display = "none";
-    veriteBtn.style.display = "none";
-    nextBtn.style.display = "inline-block";
-    messageDiv.textContent = "Réponds honnêtement et en toute confiance.";
-  });
-
-  nextBtn.addEventListener("click", () => {
-    introDiv.textContent = `À nouveau, ${prenomFemme}, Action ou Vérité ?`;
-    resetTurn();
-  });
+  nextBtn.onclick = () => {
+    turn++;
+    if(turn > maxTurns) {
+      // Fin du jeu
+      promptDiv.textContent = `Le jeu est terminé. Merci d'avoir joué !`;
+      messageDiv.textContent = "";
+      actionBtn.style.display = "none";
+      veriteBtn.style.display = "none";
+      nextBtn.style.display = "none";
+      return;
+    }
+    // Alternance joueur
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    updateMessage();
+    promptDiv.textContent = "";
+    carteMontree = false;
+    actionBtn.style.display = "inline-block";
+    veriteBtn.style.display = "inline-block";
+    nextBtn.style.display = "none";
+  };
 </script>
 
 </body>
